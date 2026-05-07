@@ -6,6 +6,7 @@
     "quick-action": "/components/quick-action/index",
     "bill-item": "/components/bill-item/index",
     "stat-grid": "/components/stat-grid/index",
-    "t-button": "/components/t-button/index"
+    "t-button": "/components/t-button/index",
+    "floating-add": "/components/floating-add/index"
   }
 }

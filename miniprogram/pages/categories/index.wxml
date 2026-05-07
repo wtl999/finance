@@ -1,0 +1,56 @@
+<view class="page categories-page safe-bottom">
+  <t-card title="分类管理" extra="当前用户">
+    <view class="intro">
+      <view class="intro__title">分类只对当前账号有效</view>
+      <view class="intro__desc">支出和收入分类分别维护，保存后会同步到你的云端资料里。</view>
+    </view>
+
+    <view class="type-tabs">
+      <view
+        wx:for="{{types}}"
+        wx:key="value"
+        class="type-tabs__item {{currentType === item.value ? 'is-active' : ''}}"
+        data-type="{{item.value}}"
+        bindtap="handleSwitchType"
+      >
+        <view class="type-tabs__label">{{item.label}}</view>
+        <view class="type-tabs__desc">{{item.desc}}</view>
+      </view>
+    </view>
+  </t-card>
+
+  <view class="spacer"></view>
+
+  <t-card title="{{currentType === 'income' ? '收入分类' : '支出分类'}}" extra="{{categories[currentType].length}} 项">
+    <view wx:if="{{categories[currentType].length}}" class="category-list">
+      <view wx:for="{{categories[currentType]}}" wx:key="value" class="category-list__item">
+        <input
+          class="category-list__input"
+          value="{{item.label}}"
+          data-index="{{index}}"
+          bindinput="handleCategoryLabelInput"
+        />
+        <view class="category-list__tone">{{item.tone}}</view>
+        <view class="category-list__delete" data-index="{{index}}" bindtap="handleDeleteCategory">删除</view>
+      </view>
+    </view>
+    <t-empty wx:else title="暂无分类" description="先添加一个分类吧" />
+  </t-card>
+
+  <view class="spacer"></view>
+
+  <t-card title="新增分类" extra="仅当前类型">
+    <view class="add-box">
+      <input class="add-box__input" placeholder="输入分类名称" value="{{draftLabel}}" bindinput="handleDraftInput" />
+      <view class="add-box__actions">
+        <t-button theme="ghost" bindtap="handleReset">恢复初始</t-button>
+        <t-button bindtap="handleAddCategory">添加分类</t-button>
+      </view>
+      <view class="add-box__save">
+        <t-button block loading="{{saving}}" bindtap="handleSave">保存分类</t-button>
+      </view>
+    </view>
+  </t-card>
+
+  <floating-add />
+</view>

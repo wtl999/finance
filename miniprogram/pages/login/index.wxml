@@ -1,27 +1,55 @@
 <view class="page login-page safe-bottom">
-  <view class="hero">
-    <view class="hero__badge">CloudBase · AI Ledger</view>
-    <view class="hero__title">{{appName}}</view>
-    <view class="hero__desc">登录后自动绑定 openid，开启账单记录、统计和 AI 分析。</view>
-  </view>
+  <view class="shell">
+    <view class="brand">
+      <view class="brand__eyebrow">AI 记账助手</view>
+      <view class="brand__title">{{appName}}</view>
+      <view class="brand__desc">先把头像、昵称、手机号补全，后面记账和 AI 分析会更顺手。</view>
+    </view>
 
-  <t-card title="开始使用" extra="MVP">
-    <view class="login-card">
-      <view class="login-card__line">首次登录会自动创建 users collection</view>
-      <view class="login-card__line">头像与昵称由微信授权获取</view>
-      <view class="login-card__line">登录状态本地持久化</view>
-      <view class="login-card__actions">
-        <t-button block loading="{{loading}}" bindtap="handleLogin">微信授权登录</t-button>
+    <view class="profile-panel">
+      <view class="profile-panel__avatar">
+        <button class="avatar-picker" open-type="chooseAvatar" bindchooseavatar="handleChooseAvatar">
+          <image class="avatar-picker__img" src="{{avatarPreview}}" mode="aspectFill" />
+          <view class="avatar-picker__mask">更换头像</view>
+        </button>
+      </view>
+
+      <view class="profile-panel__fields">
+        <view class="field">
+          <view class="field__label">昵称</view>
+          <input
+            class="field__input"
+            placeholder="输入一个好记的昵称"
+            value="{{profile.nickname}}"
+            bindinput="handleNicknameInput"
+            maxlength="20"
+          />
+        </view>
+
+        <view class="field">
+          <view class="field__label">手机号</view>
+          <view class="field__phone">
+            <view class="field__value">
+              {{profile.phoneBound ? '已授权' : '尚未绑定'}}
+            </view>
+            <button class="field__button" open-type="getPhoneNumber" bindgetphonenumber="handlePhoneNumber">
+              绑定手机号
+            </button>
+          </view>
+        </view>
+      </view>
+
+      <view class="profile-panel__actions">
+        <t-button theme="ghost" block bindtap="fetchWxProfile">同步微信头像昵称</t-button>
+        <t-button block loading="{{loading}}" bindtap="handleLogin">完成并登录</t-button>
+        <t-button theme="ghost" block bindtap="handleContinueWithoutPhone">先跳过手机号</t-button>
       </view>
     </view>
-  </t-card>
 
-  <t-section title="项目约束" extra="README">
-    <view class="rules">
-      <view class="rules__item">原生小程序</view>
-      <view class="rules__item">JavaScript</view>
-      <view class="rules__item">微信云开发</view>
-      <view class="rules__item">模块化结构</view>
+    <view class="hint-list">
+      <view class="hint-item">头像和昵称会同步到个人资料</view>
+      <view class="hint-item">手机号仅在你授权后写入云端</view>
+      <view class="hint-item">登录后自动进入首页</view>
     </view>
-  </t-section>
+  </view>
 </view>

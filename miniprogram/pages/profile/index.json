@@ -2,6 +2,8 @@
   "usingComponents": {
     "t-card": "/components/t-card/index",
     "t-button": "/components/t-button/index",
-    "profile-summary": "/components/profile-summary/index"
+    "profile-summary": "/components/profile-summary/index",
+    "t-empty": "/components/t-empty/index",
+    "floating-add": "/components/floating-add/index"
   }
 }

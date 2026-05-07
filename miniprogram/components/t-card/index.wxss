@@ -1,10 +1,20 @@
 .card {
-  background: rgba(15, 23, 42, 0.78);
-  border: 1rpx solid rgba(148, 163, 184, 0.14);
-  border-radius: 28rpx;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.84), rgba(15, 23, 42, 0.62));
+  border: 1rpx solid rgba(148, 163, 184, 0.16);
+  border-radius: 30rpx;
   padding: 28rpx;
-  box-shadow: 0 18rpx 50rpx rgba(2, 6, 23, 0.22);
+  box-shadow: 0 24rpx 70rpx rgba(2, 6, 23, 0.28);
   backdrop-filter: blur(18px);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(125, 211, 252, 0.12), transparent 40%);
+  pointer-events: none;
 }
 
 .card--compact {
@@ -16,6 +26,8 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20rpx;
+  position: relative;
+  z-index: 1;
 }
 
 .card__title {
@@ -31,4 +43,6 @@
 
 .card__body {
   color: #cbd5e1;
+  position: relative;
+  z-index: 1;
 }

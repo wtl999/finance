@@ -1,25 +1,38 @@
 const { CLOUD_ENV, STORAGE_KEYS } = require('./utils/config');
+const { envList } = require('./envList');
 const auth = require('./services/auth');
 const storage = require('./utils/storage');
 
+const resolveCloudEnv = () => {
+  if (CLOUD_ENV) return CLOUD_ENV;
+  const firstEnv = Array.isArray(envList) ? envList[0] : null;
+  return firstEnv?.envId || firstEnv?.env || '';
+};
+
+const resolvedEnv = resolveCloudEnv();
+
 App({
   globalData: {
-    env: CLOUD_ENV,
+    env: resolvedEnv,
     isLoggedIn: false,
     userInfo: null,
   },
 
   onLaunch() {
     if (wx.cloud) {
-      const initOptions = CLOUD_ENV ? { env: CLOUD_ENV } : {};
+      const initOptions = resolvedEnv ? { env: resolvedEnv } : {};
       wx.cloud.init({
         ...initOptions,
         traceUser: true,
       });
     }
 
+    if (!resolvedEnv) {
+      console.warn('[app] Cloud env is not configured. Set miniprogram/utils/config.js CLOUD_ENV or miniprogram/envList.js.');
+    }
+
     this.syncLoginState();
-    if (this.globalData.isLoggedIn) {
+    if (this.globalData.isLoggedIn && resolvedEnv) {
       auth.refreshUserState().catch(() => null);
     }
   },

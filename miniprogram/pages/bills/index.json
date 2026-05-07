@@ -4,7 +4,8 @@
     "t-empty": "/components/t-empty/index",
     "t-button": "/components/t-button/index",
     "bill-item": "/components/bill-item/index",
-    "bill-form": "/components/bill-form/index"
+    "bill-form": "/components/bill-form/index",
+    "floating-add": "/components/floating-add/index"
   },
   "enablePullDownRefresh": true,
   "onReachBottomDistance": 120

@@ -1,0 +1,4 @@
+<view wx:if="{{!hidden}}" class="fab" bindtap="handleTap">
+  <view class="fab__inner">+</view>
+  <view class="fab__label">记账</view>
+</view>

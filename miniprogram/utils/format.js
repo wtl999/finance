@@ -16,6 +16,11 @@ const formatMonth = (value) => {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}`;
 };
 
+const formatYear = (value) => {
+  const date = toDate(value);
+  return `${date.getFullYear()}`;
+};
+
 const formatDateTime = (value) => {
   const date = toDate(value);
   return `${formatDate(date)} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
@@ -34,6 +39,7 @@ const safeNumber = (value) => {
 module.exports = {
   formatDate,
   formatMonth,
+  formatYear,
   formatDateTime,
   formatMoney,
   safeNumber,

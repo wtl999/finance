@@ -15,12 +15,19 @@
 
   <view class="spacer"></view>
 
-  <t-card title="操作" extra="快捷入口">
+  <t-card title="分类管理" extra="当前用户">
     <view class="menu">
+      <view class="menu__item" bindtap="handleCategories">
+        <view class="menu__main">
+          <view class="menu__title">支出 / 收入分类</view>
+          <view class="menu__desc">只对当前账号生效</view>
+        </view>
+        <view class="menu__arrow">›</view>
+      </view>
       <view class="menu__item" bindtap="handleExport">
         <view class="menu__main">
           <view class="menu__title">导出账单</view>
-          <view class="menu__desc">导出当前月账单为 CSV</view>
+          <view class="menu__desc">导出当前月份账单为 CSV</view>
         </view>
         <view class="menu__arrow">›</view>
       </view>

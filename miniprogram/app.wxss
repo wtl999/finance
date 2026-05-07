@@ -1,5 +1,12 @@
 page {
-  background: #0b1220;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1rpx, transparent 1rpx),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1rpx, transparent 1rpx),
+    radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 28%),
+    radial-gradient(circle at top right, rgba(14, 165, 233, 0.12), transparent 24%),
+    linear-gradient(180deg, #07101d 0%, #0b1220 48%, #050913 100%);
+  background-size: 120rpx 120rpx, 120rpx 120rpx, auto, auto, auto;
+  background-position: 0 0, 0 0, center top, center top, center top;
   color: #e5eefb;
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
 }
@@ -28,6 +35,8 @@ button::after {
 .page {
   min-height: 100vh;
   padding: 24rpx;
+  position: relative;
+  overflow-x: hidden;
 }
 
 .safe-bottom {

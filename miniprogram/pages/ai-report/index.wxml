@@ -1,32 +1,24 @@
 <view class="page report-page safe-bottom">
   <view class="hero">
     <view class="hero__title">AI 消费分析</view>
-    <view class="hero__subtitle">{{analysis.ui.subtitle || '周报 / 月报 / 高频行为分析'}}</view>
+    <view class="hero__subtitle">{{analysis.ui.subtitle || '周报 / 月报 / 年报分析'}}</view>
     <view class="hero__meta">
       <view class="hero__badge">{{analysis.ui.badge || '月报'}}</view>
-      <view class="hero__range">{{rangeLabel || '自动分析近周期数据'}}</view>
+      <view class="hero__range">{{rangeLabel || '自动分析当前周期数据'}}</view>
     </view>
   </view>
 
   <view class="toolbar">
     <view class="segmented">
-      <view
-        class="segmented__item {{periodType === 'week' ? 'segmented__item--active' : ''}}"
-        data-value="week"
-        bindtap="handlePeriodChange"
-      >
-        周报
-      </view>
-      <view
-        class="segmented__item {{periodType === 'month' ? 'segmented__item--active' : ''}}"
-        data-value="month"
-        bindtap="handlePeriodChange"
-      >
-        月报
-      </view>
+      <view class="segmented__item {{periodType === 'week' ? 'segmented__item--active' : ''}}" data-value="week" bindtap="handlePeriodChange">周报</view>
+      <view class="segmented__item {{periodType === 'month' ? 'segmented__item--active' : ''}}" data-value="month" bindtap="handlePeriodChange">月报</view>
+      <view class="segmented__item {{periodType === 'year' ? 'segmented__item--active' : ''}}" data-value="year" bindtap="handlePeriodChange">年报</view>
     </view>
-    <picker mode="date" fields="month" value="{{month}}" bindchange="handleMonthChange">
+    <picker wx:if="{{periodType === 'month'}}" mode="date" fields="month" value="{{month}}" bindchange="handleMonthChange">
       <view class="toolbar__picker">{{month}}</view>
+    </picker>
+    <picker wx:if="{{periodType === 'year'}}" mode="date" fields="year" value="{{year}}" bindchange="handleYearChange">
+      <view class="toolbar__picker">{{year}}</view>
     </picker>
     <t-button loading="{{loading}}" bindtap="handleAnalyze">重新分析</t-button>
   </view>
@@ -39,7 +31,7 @@
       <view class="overview__text overview__text--muted">{{analysis.trend.detail}}</view>
       <view class="overview__text overview__text--muted">{{analysis.budgetForecast.suggestion}}</view>
     </view>
-    <t-empty wx:else title="暂无分析结果" description="请先记录账单，再生成周报或月报。"></t-empty>
+    <t-empty wx:else title="暂无分析结果" description="请先记录账单，再生成周报、月报或年报。" />
   </t-card>
 
   <view class="spacer"></view>
@@ -52,12 +44,7 @@
 
   <view wx:if="{{trendOption}}">
     <t-card title="消费趋势" extra="Trend">
-      <stats-chart
-        title="消费趋势"
-        subtitle="支出 / 收入变化"
-        option="{{trendOption}}"
-        height="420"
-      />
+      <stats-chart title="消费趋势" subtitle="支出 / 收入变化" option="{{trendOption}}" height="420" />
     </t-card>
   </view>
 
@@ -76,7 +63,7 @@
         </view>
       </view>
     </view>
-    <t-empty wx:else title="暂无异常消费" description="当前周期没有明显的异常单笔支出。"></t-empty>
+    <t-empty wx:else title="暂无异常消费" description="当前周期没有明显的大额异常支出。" />
   </t-card>
 
   <view class="spacer"></view>
@@ -94,7 +81,7 @@
         </view>
       </view>
     </view>
-    <t-empty wx:else title="暂无分类变化" description="请继续积累账单，系统会自动生成分类变化分析。"></t-empty>
+    <t-empty wx:else title="暂无分类变化" description="继续积累账单，系统会自动生成对比分析。" />
   </t-card>
 
   <view class="spacer"></view>
@@ -110,7 +97,7 @@
         <view class="frequency__hint">{{item.suggestion}}</view>
       </view>
     </view>
-    <t-empty wx:else title="暂无高频行为" description="当前周期未形成明显高频消费模式。"></t-empty>
+    <t-empty wx:else title="暂无高频行为" description="当前周期还没有形成明显的重复消费模式。" />
   </t-card>
 
   <view class="spacer"></view>
@@ -119,6 +106,6 @@
     <view wx:if="{{actionItems.length}}" class="actions">
       <view wx:for="{{actionItems}}" wx:key="*this" class="actions__item">{{item}}</view>
     </view>
-    <t-empty wx:else title="暂无建议" description="分析完成后会自动输出可执行建议。"></t-empty>
+    <t-empty wx:else title="暂无建议" description="分析完成后会自动输出可执行建议。" />
   </t-card>
 </view>

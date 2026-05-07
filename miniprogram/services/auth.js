@@ -6,10 +6,11 @@ const isLoggedIn = () => Boolean(storage.get(STORAGE_KEYS.LOGIN_FLAG, false));
 
 const getCachedUser = () => storage.get(STORAGE_KEYS.USER_PROFILE, null);
 
-const login = async (profile = {}) => {
+const login = async (profile = {}, phoneCode = '') => {
   const result = await callFunction(CLOUD_FUNCTIONS.LOGIN, {
     action: 'login',
     data: profile,
+    phoneCode,
   });
 
   if (result && result.success) {
@@ -33,10 +34,11 @@ const refreshUserState = async () => {
   return result;
 };
 
-const updateProfile = async (profile = {}) => {
+const updateProfile = async (profile = {}, phoneCode = '') => {
   const result = await callFunction(CLOUD_FUNCTIONS.LOGIN, {
     action: 'updateProfile',
     data: profile,
+    phoneCode,
   });
 
   if (result && result.success) {

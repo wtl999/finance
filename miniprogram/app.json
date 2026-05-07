@@ -4,6 +4,7 @@
     "pages/index/index",
     "pages/add/index",
     "pages/bills/index",
+    "pages/categories/index",
     "pages/stats/index",
     "pages/profile/index",
     "pages/ai-report/index"
@@ -26,12 +27,6 @@
         "text": "首页",
         "iconPath": "images/icons/home.png",
         "selectedIconPath": "images/icons/home-active.png"
-      },
-      {
-        "pagePath": "pages/add/index",
-        "text": "记账",
-        "iconPath": "images/icons/goods.png",
-        "selectedIconPath": "images/icons/goods-active.png"
       },
       {
         "pagePath": "pages/bills/index",

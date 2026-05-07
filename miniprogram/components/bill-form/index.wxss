@@ -21,7 +21,7 @@
   width: 100%;
   min-height: 76rpx;
   padding: 18rpx 20rpx;
-  border-radius: 20rpx;
+  border-radius: 22rpx;
   background: rgba(2, 6, 23, 0.4);
   border: 1rpx solid rgba(148, 163, 184, 0.16);
   color: #f8fafc;

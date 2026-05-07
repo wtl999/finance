@@ -1,5 +1,6 @@
 .stats-page {
   padding-top: 16rpx;
+  min-height: 100vh;
 }
 
 .topbar {
@@ -30,6 +31,10 @@
   flex-direction: column;
   gap: 24rpx;
   animation: fadeUp 280ms ease-out both;
+}
+
+.chart-stack t-card {
+  overflow: hidden;
 }
 
 .insight {

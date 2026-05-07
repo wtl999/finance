@@ -56,4 +56,6 @@
     </view>
     <t-empty wx:else title="暂无洞察" description="记录更多账单后，AI 洞察会更完整。" />
   </t-card>
+
+  <floating-add />
 </view>

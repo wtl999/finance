@@ -1,3 +1,5 @@
+const cloud = require('wx-server-sdk');
+
 const FREE_AI_QUOTA_LIMIT = 20;
 const MEMBER_LEVEL_FREE = 'free';
 const MEMBER_LEVEL_VIP = 'vip';
@@ -21,9 +23,20 @@ const getMonthKey = (value = new Date()) => {
 const getMonthStartText = (value = new Date()) => `${getMonthKey(value)}-01`;
 
 const sanitizeProfile = (profile = {}) => ({
-  nickname: typeof profile.nickName === 'string' ? profile.nickName.trim() : '',
+  nickname: typeof profile.nickName === 'string'
+    ? profile.nickName.trim()
+    : (typeof profile.nickname === 'string' ? profile.nickname.trim() : ''),
   avatarUrl: typeof profile.avatarUrl === 'string' ? profile.avatarUrl.trim() : '',
+  phoneNumber: typeof profile.phoneNumber === 'string' ? profile.phoneNumber.trim() : '',
+  phoneCountryCode: typeof profile.phoneCountryCode === 'string' ? profile.phoneCountryCode.trim() : '',
 });
+
+const maskPhoneNumber = (value = '') => {
+  const phone = String(value || '').trim();
+  if (!phone) return '';
+  if (phone.length <= 7) return phone;
+  return `${phone.slice(0, 3)}****${phone.slice(-4)}`;
+};
 
 const normalizeQuotaLimit = (value) => {
   const limit = Number(value);
@@ -66,9 +79,19 @@ const computeMemberState = (user = {}, now = new Date()) => {
   };
 };
 
-const buildUserDoc = ({ existing = null, openid, appid, unionid, profile = {}, now = new Date(), serverNow = now }) => {
+const buildUserDoc = ({
+  existing = null,
+  openid,
+  appid,
+  unionid,
+  profile = {},
+  now = new Date(),
+  serverNow = now,
+}) => {
   const normalizedProfile = sanitizeProfile(profile);
   const memberState = computeMemberState(existing || {}, now);
+  const phoneNumber = normalizedProfile.phoneNumber || existing?.phoneNumber || '';
+  const phoneCountryCode = normalizedProfile.phoneCountryCode || existing?.phoneCountryCode || '';
 
   return {
     openid,
@@ -76,6 +99,10 @@ const buildUserDoc = ({ existing = null, openid, appid, unionid, profile = {}, n
     unionid: unionid || '',
     nickname: normalizedProfile.nickname || existing?.nickname || '微信用户',
     avatarUrl: normalizedProfile.avatarUrl || existing?.avatarUrl || '',
+    phoneNumber,
+    phoneCountryCode,
+    phoneBound: Boolean(phoneNumber),
+    phoneNumberMasked: maskPhoneNumber(phoneNumber),
     memberLevel: existing?.memberLevel === MEMBER_LEVEL_VIP ? MEMBER_LEVEL_VIP : MEMBER_LEVEL_FREE,
     memberStatus: memberState.memberStatus,
     vipExpireTime: existing?.vipExpireTime || null,
@@ -92,18 +119,56 @@ const buildUserDoc = ({ existing = null, openid, appid, unionid, profile = {}, n
 
 const buildViewUser = (doc = {}, now = new Date()) => {
   const state = computeMemberState(doc, now);
+  const phoneNumber = doc.phoneNumber || '';
 
   return {
     ...doc,
     ...state,
+    phoneBound: Boolean(phoneNumber),
+    phoneNumberMasked: maskPhoneNumber(phoneNumber),
     aiQuotaRemainingText: state.aiUnlimited ? '无限' : String(state.aiQuotaRemaining),
     memberLabel: state.aiUnlimited ? '会员' : (state.memberStatus === MEMBER_STATUS_EXPIRED ? '已过期' : '免费'),
   };
 };
 
+const ensureUsersCollection = async (db) => {
+  try {
+    await db.createCollection('users');
+  } catch (error) {
+    const errMsg = String(error?.errMsg || error?.message || error || '');
+    if (/resourceexist|already exists|table exist|collection already exists|exists/i.test(errMsg)) {
+      return;
+    }
+
+    throw error;
+  }
+};
+
 const getUserByOpenId = async (db, openid) => {
   const result = await db.collection('users').where({ openid }).limit(1).get();
   return result.data[0] || null;
+};
+
+const resolvePhoneInfo = async (phoneCode) => {
+  if (!phoneCode) return null;
+
+  const response = await cloud.openapi.phonenumber.getPhoneNumber({
+    code: phoneCode,
+  });
+
+  const phoneInfo = response?.phoneInfo
+    || response?.result?.phoneInfo
+    || response?.data?.phoneInfo
+    || response?.phone_info
+    || null;
+
+  if (!phoneInfo) return null;
+
+  return {
+    phoneNumber: String(phoneInfo.phoneNumber || phoneInfo.purePhoneNumber || '').trim(),
+    phoneCountryCode: String(phoneInfo.countryCode || '').trim(),
+    raw: phoneInfo,
+  };
 };
 
 const ensureUserMembership = async ({
@@ -141,6 +206,38 @@ const ensureUserMembership = async ({
   };
 };
 
+const upsertUserProfile = async ({
+  db,
+  openid,
+  appid,
+  unionid,
+  profile = {},
+  phoneCode = '',
+  now = new Date(),
+  serverNow = now,
+}) => {
+  const phoneInfo = phoneCode ? await resolvePhoneInfo(phoneCode) : null;
+  const mergedProfile = {
+    ...profile,
+    ...(phoneInfo?.phoneNumber
+      ? {
+          phoneNumber: phoneInfo.phoneNumber,
+          phoneCountryCode: phoneInfo.phoneCountryCode,
+        }
+      : {}),
+  };
+
+  return ensureUserMembership({
+    db,
+    openid,
+    appid,
+    unionid,
+    profile: mergedProfile,
+    now,
+    serverNow,
+  });
+};
+
 const syncUserMembership = async ({ db, openid, now = new Date(), serverNow = now }) => {
   const existing = await getUserByOpenId(db, openid);
   if (!existing) {
@@ -155,6 +252,8 @@ const syncUserMembership = async ({ db, openid, now = new Date(), serverNow = no
     profile: {
       nickName: existing.nickname,
       avatarUrl: existing.avatarUrl,
+      phoneNumber: existing.phoneNumber,
+      phoneCountryCode: existing.phoneCountryCode,
     },
     now,
     serverNow,
@@ -218,6 +317,8 @@ const consumeAiQuota = async ({ db, openid, amount = 1, now = new Date(), server
       profile: {
         nickName: existing.nickname,
         avatarUrl: existing.avatarUrl,
+        phoneNumber: existing.phoneNumber,
+        phoneCountryCode: existing.phoneCountryCode,
       },
       now,
       serverNow,
@@ -259,6 +360,11 @@ module.exports = {
   computeMemberState,
   consumeAiQuota,
   ensureUserMembership,
+  ensureUsersCollection,
   getMonthKey,
+  maskPhoneNumber,
+  resolvePhoneInfo,
+  sanitizeProfile,
   syncUserMembership,
+  upsertUserProfile,
 };

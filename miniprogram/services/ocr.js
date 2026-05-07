@@ -47,8 +47,17 @@ const saveBillFromOcr = async (ocrResult) => {
     };
   }
 
+  const parsedBill = ocrResult.parsedBill;
+  if (!parsedBill.amount || !parsedBill.date) {
+    return {
+      success: false,
+      message: 'invalid parsed bill',
+      data: parsedBill,
+    };
+  }
+
   return billService.createBill({
-    ...ocrResult.parsedBill,
+    ...parsedBill,
     source: 'ocr',
     aiParsed: ocrResult,
   });
@@ -75,13 +84,43 @@ const uploadRecognizeAndSave = async ({ filePath, source = 'wechat' }) => {
   });
 
   if (!ocrRes.success) {
-    return ocrRes;
+    console.error('[OCR] recognize failed', {
+      filePath,
+      source: normalizedSource,
+      response: ocrRes,
+    });
+    return {
+      ...ocrRes,
+      message: ocrRes.message || ocrRes.detail || 'recognize failed',
+    };
   }
 
   const billRes = await saveBillFromOcr(ocrRes.data);
 
+  if (!billRes.success) {
+    console.error('[OCR] save bill failed', {
+      filePath,
+      source: normalizedSource,
+      ocr: ocrRes.data,
+      response: billRes,
+    });
+    return {
+      success: false,
+      message: billRes.message || 'save bill failed',
+      data: {
+        upload: uploadRes,
+        ocr: ocrRes.data,
+        bill: billRes.data || null,
+        cacheKey: buildOcrCacheKey({
+          source: normalizedSource,
+          fileHash,
+        }),
+      },
+    };
+  }
+
   return {
-    success: Boolean(billRes.success),
+    success: true,
     data: {
       upload: uploadRes,
       ocr: ocrRes.data,

@@ -1,25 +1,44 @@
 const cloud = require('wx-server-sdk');
-const { ensureUserMembership, syncUserMembership } = require('../shared/membership');
+const {
+  ensureUsersCollection,
+  syncUserMembership,
+  upsertUserProfile,
+} = require('../shared');
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV,
 });
 
 const db = cloud.database();
-const getContext = () => cloud.getWXContext();
 
-const syncCurrentUser = async (profile = null) => {
-  const { OPENID, APPID, UNIONID } = getContext();
+exports.main = async (event) => {
+  const action = event.action || 'sync';
+  const profile = event.data || {};
+  const phoneCode = event.phoneCode || profile.phoneCode || '';
+  const { OPENID, APPID, UNIONID } = cloud.getWXContext();
   const now = new Date();
   const serverNow = db.serverDate();
 
-  if (profile) {
-    const result = await ensureUserMembership({
+  await ensureUsersCollection(db);
+
+  if (action === 'sync' || action === 'refresh') {
+    const result = await syncUserMembership({ db, openid: OPENID, now, serverNow });
+    if (result) {
+      return {
+        success: true,
+        data: { user: result.user },
+      };
+    }
+  }
+
+  if (action === 'updateProfile') {
+    const result = await upsertUserProfile({
       db,
       openid: OPENID,
       appid: APPID,
       unionid: UNIONID || '',
       profile,
+      phoneCode,
       now,
       serverNow,
     });
@@ -32,28 +51,13 @@ const syncCurrentUser = async (profile = null) => {
     };
   }
 
-  const result = await syncUserMembership({
-    db,
-    openid: OPENID,
-    now,
-    serverNow,
-  });
-
-  if (result) {
-    return {
-      success: true,
-      data: {
-        user: result.user,
-      },
-    };
-  }
-
-  const created = await ensureUserMembership({
+  const result = await upsertUserProfile({
     db,
     openid: OPENID,
     appid: APPID,
     unionid: UNIONID || '',
     profile: {},
+    phoneCode,
     now,
     serverNow,
   });
@@ -61,25 +65,7 @@ const syncCurrentUser = async (profile = null) => {
   return {
     success: true,
     data: {
-      user: created.user,
+      user: result.user,
     },
-  };
-};
-
-exports.main = async (event) => {
-  const action = event.action || 'sync';
-  const profile = event.data || {};
-
-  if (action === 'sync' || action === 'refresh') {
-    return syncCurrentUser(profile);
-  }
-
-  if (action === 'updateProfile') {
-    return syncCurrentUser(profile);
-  }
-
-  return {
-    success: false,
-    message: 'unknown action',
   };
 };

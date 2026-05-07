@@ -1,3 +1,27 @@
+const {
+  CATEGORY_TONES,
+  DEFAULT_BILL_CATEGORIES,
+  buildViewUser,
+  getCategoryList,
+  getCategoryMeta,
+  normalizeBillCategories,
+  normalizeCategoryItem,
+} = require('./category');
+const {
+  buildMemberViewUser,
+  checkAiPermission,
+  consumeAiQuota,
+  ensureUserMembership,
+  ensureUsersCollection,
+  getMonthKey,
+  maskPhoneNumber,
+  resolvePhoneInfo,
+  sanitizeProfile,
+  syncUserMembership,
+  upsertUserProfile,
+} = require('./membership');
+const { withAiPermission } = require('./middleware');
+
 const normalizeMonth = (value) => {
   if (!value) {
     const now = new Date();
@@ -84,10 +108,27 @@ const summarizeBills = (list = [], today = '') => {
 };
 
 module.exports = {
+  CATEGORY_TONES,
+  DEFAULT_BILL_CATEGORIES,
+  buildMemberViewUser,
+  buildViewUser,
+  checkAiPermission,
+  consumeAiQuota,
+  ensureUserMembership,
+  ensureUsersCollection,
+  getCategoryList,
+  getCategoryMeta,
+  getMonthKey,
   normalizeMonth,
   normalizeDate,
   normalizeBillInput,
+  normalizeBillCategories,
+  normalizeCategoryItem,
+  maskPhoneNumber,
+  resolvePhoneInfo,
+  sanitizeProfile,
+  syncUserMembership,
+  upsertUserProfile,
   summarizeBills,
-  ...require('./membership'),
-  ...require('./middleware'),
+  withAiPermission,
 };

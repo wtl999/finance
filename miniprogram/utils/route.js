@@ -3,6 +3,7 @@ const ROUTES = {
   home: '/pages/index/index',
   add: '/pages/add/index',
   bills: '/pages/bills/index',
+  categories: '/pages/categories/index',
   stats: '/pages/stats/index',
   profile: '/pages/profile/index',
   report: '/pages/ai-report/index',

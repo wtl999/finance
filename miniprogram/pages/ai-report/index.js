@@ -1,7 +1,7 @@
 const auth = require('../../services/auth');
 const aiAnalyzeService = require('../../services/aiAnalyze');
 const { ROUTES, go } = require('../../utils/route');
-const { formatMonth, formatMoney } = require('../../utils/format');
+const { formatMonth, formatYear } = require('../../utils/format');
 
 const buildTrendOption = (trend = {}) => ({
   backgroundColor: 'transparent',
@@ -109,40 +109,12 @@ const formatRate = (value = 0) => {
   return '0%';
 };
 
-const pressureLabel = (value = 'low') => {
-  if (value === 'high') return '高';
-  if (value === 'medium') return '中';
-  return '低';
-};
-
-const mapSummaryCards = (summary = {}, budget = {}) => [
-  {
-    label: '支出',
-    value: `¥${formatMoney(summary.totalExpense || 0)}`,
-    desc: `${summary.expenseCount || 0} 笔`,
-  },
-  {
-    label: '收入',
-    value: `¥${formatMoney(summary.totalIncome || 0)}`,
-    desc: `${summary.incomeCount || 0} 笔`,
-  },
-  {
-    label: '净额',
-    value: `¥${formatMoney(summary.netAmount || 0)}`,
-    desc: summary.netAmount >= 0 ? '结余' : '超支',
-  },
-  {
-    label: '预算预测',
-    value: `¥${formatMoney(budget.forecastExpense || 0)}`,
-    desc: `${pressureLabel(budget.pressure)}压力`,
-  },
-];
-
 Page({
   data: {
     loading: false,
     periodType: 'month',
     month: formatMonth(new Date()),
+    year: formatYear(new Date()),
     analysis: {
       ui: {},
     },
@@ -175,6 +147,7 @@ Page({
       const result = await aiAnalyzeService.analyzeBills({
         periodType: this.data.periodType,
         month: this.data.month,
+        year: this.data.year,
       });
 
       const data = result.data || {};
@@ -194,7 +167,28 @@ Page({
           highFrequency: data.highFrequency,
           budgetForecast: data.budgetForecast,
         },
-        summaryCards: mapSummaryCards(data.summary || {}, data.budgetForecast || {}),
+        summaryCards: [
+          {
+            label: '支出',
+            value: `¥${data.summary?.totalExpense || 0}`,
+            desc: `${data.summary?.expenseCount || 0} 笔`,
+          },
+          {
+            label: '收入',
+            value: `¥${data.summary?.totalIncome || 0}`,
+            desc: `${data.summary?.incomeCount || 0} 笔`,
+          },
+          {
+            label: '结余',
+            value: `¥${data.summary?.netAmount || 0}`,
+            desc: '收入 - 支出',
+          },
+          {
+            label: '预算预测',
+            value: `¥${data.budgetForecast?.forecastExpense || 0}`,
+            desc: `${data.budgetForecast?.pressure || 'low'} pressure`,
+          },
+        ],
         trendOption: buildTrendOption(data.trend || {}),
         anomalies: (analysis?.anomalies || data.anomalies || []).map((item) => ({
           ...item,
@@ -242,6 +236,19 @@ Page({
       },
       () => {
         if (this.data.periodType === 'month') {
+          this.loadAnalysis();
+        }
+      },
+    );
+  },
+
+  handleYearChange(event) {
+    this.setData(
+      {
+        year: event.detail.value,
+      },
+      () => {
+        if (this.data.periodType === 'year') {
           this.loadAnalysis();
         }
       },

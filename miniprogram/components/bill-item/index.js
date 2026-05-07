@@ -1,11 +1,15 @@
 const { formatDate, formatMoney } = require('../../utils/format');
-const { getCategoryMeta } = require('../../utils/bill');
+const { getCategoryMeta, getBillCategories } = require('../../utils/category');
 
 Component({
   properties: {
     bill: {
       type: Object,
       value: {},
+    },
+    categories: {
+      type: Object,
+      value: null,
     },
     showDelete: {
       type: Boolean,
@@ -32,9 +36,9 @@ Component({
   },
 
   observers: {
-    bill(bill) {
+    'bill, categories'(bill, categories) {
       if (!bill) return;
-      const categoryMeta = bill.categoryMeta || getCategoryMeta(bill.category);
+      const categoryMeta = bill.categoryMeta || getCategoryMeta(bill.category, categories || getBillCategories(), bill.type);
       this.setData({
         normalizedBill: {
           ...bill,

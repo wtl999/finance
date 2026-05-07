@@ -1,3 +1,5 @@
+const { getCategoryOptions, resolveCategoryValue } = require('../../utils/category');
+
 Component({
   properties: {
     form: {
@@ -12,8 +14,11 @@ Component({
       },
     },
     categories: {
-      type: Array,
-      value: [],
+      type: Object,
+      value: {
+        expense: [],
+        income: [],
+      },
     },
     loading: {
       type: Boolean,
@@ -22,6 +27,25 @@ Component({
     aiLoading: {
       type: Boolean,
       value: false,
+    },
+  },
+
+  data: {
+    currentCategories: [],
+  },
+
+  observers: {
+    'form.type, form.category, categories'(type, category, categories) {
+      const normalizedCategories = getCategoryOptions(categories, type || 'expense');
+      const resolvedCategory = resolveCategoryValue(categories, type || 'expense', category || '');
+      const hasCurrent = normalizedCategories.some((item) => item.value === category || item.label === category);
+      const currentCategories = hasCurrent || !resolvedCategory
+        ? normalizedCategories
+        : [{ value: category, label: category, tone: 'gray' }].concat(normalizedCategories);
+
+      this.setData({
+        currentCategories,
+      });
     },
   },
 

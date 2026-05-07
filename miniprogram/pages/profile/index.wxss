@@ -19,7 +19,7 @@
 .stats__item {
   padding: 18rpx 16rpx;
   border-radius: 22rpx;
-  background: rgba(15, 23, 42, 0.72);
+  background: rgba(15, 23, 42, 0.78);
   border: 1rpx solid rgba(148, 163, 184, 0.12);
 }
 

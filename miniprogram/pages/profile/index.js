@@ -3,6 +3,7 @@ const auth = require('../../services/auth');
 const billService = require('../../services/bill');
 const { ROUTES, go } = require('../../utils/route');
 const { formatMonth, formatMoney } = require('../../utils/format');
+const { getBillCategories } = require('../../utils/category');
 
 const CURRENT_MONTH = formatMonth(new Date());
 const DEFAULT_USER = {
@@ -15,9 +16,7 @@ const DEFAULT_USER = {
 };
 
 const escapeCsv = (value) =>
-  `"${String(value ?? '')
-    .replace(/"/g, '""')
-    .replace(/\r?\n/g, ' ')}"`;
+  `"${String(value ?? '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`;
 
 const buildCsv = (bills = []) => {
   const rows = [
@@ -74,6 +73,7 @@ Page({
       totalIncome: 0,
     },
     profileCards: [],
+    categories: getBillCategories(auth.getCachedUser()),
   },
 
   onShow() {
@@ -98,10 +98,9 @@ Page({
         }).catch(() => null),
       ]);
 
-      const nextUser = userResult?.success
-        ? userResult.data.user
-        : auth.getCachedUser() || DEFAULT_USER;
+      const nextUser = userResult?.success ? userResult.data.user : auth.getCachedUser() || DEFAULT_USER;
       const summary = summaryResult?.data || this.data.monthSummary;
+      const categories = getBillCategories(nextUser);
 
       if (userResult?.success && app.setLoginState) {
         app.setLoginState(nextUser);
@@ -113,6 +112,7 @@ Page({
           ...nextUser,
           memberLabel: nextUser.memberLabel || (nextUser.aiUnlimited ? '会员' : '免费'),
         },
+        categories,
         monthSummary: summary,
         profileCards: [
           {
@@ -142,6 +142,10 @@ Page({
         this.setData({ loading: false });
       }
     }
+  },
+
+  handleCategories() {
+    go(ROUTES.categories, 'navigateTo');
   },
 
   handleSettings() {

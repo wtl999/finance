@@ -7,7 +7,7 @@
 .empty__icon {
   font-size: 56rpx;
   margin-bottom: 16rpx;
-  color: #38bdf8;
+  color: #7dd3fc;
 }
 
 .empty__title {

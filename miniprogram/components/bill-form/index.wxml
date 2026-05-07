@@ -16,7 +16,7 @@
     <view class="bill-form__label">分类</view>
     <view class="bill-form__category-grid">
       <view
-        wx:for="{{categories}}"
+        wx:for="{{currentCategories}}"
         wx:key="value"
         class="bill-form__category {{form.category === item.value ? 'is-active' : ''}} bill-form__category--{{item.tone || 'gray'}}"
         data-value="{{item.value}}"
@@ -46,6 +46,6 @@
 
   <view class="bill-form__actions">
     <t-button theme="ghost" loading="{{aiLoading}}" bindtap="handleAiClassify">AI 自动分类</t-button>
-    <t-button block loading="{{loading}}" bindtap="handleSubmit">保存到账单数据库</t-button>
+    <t-button block loading="{{loading}}" bindtap="handleSubmit">保存到账单</t-button>
   </view>
 </view>

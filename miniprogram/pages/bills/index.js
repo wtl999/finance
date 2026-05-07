@@ -1,16 +1,18 @@
+const app = getApp();
 const auth = require('../../services/auth');
 const billService = require('../../services/bill');
+const categoryService = require('../../services/category');
 const { ROUTES, go } = require('../../utils/route');
 const { formatDate, formatMoney, formatMonth, formatDateTime } = require('../../utils/format');
 const { groupBillsByDate } = require('../../utils/bill');
 const { validateBillForm } = require('../../utils/validators');
-const { BILL_CATEGORIES } = require('../../utils/config');
+const { getBillCategories, resolveCategoryValue } = require('../../utils/category');
 
 const PAGE_SIZE = 10;
 
-const makeEmptyForm = () => ({
+const makeEmptyForm = (categories = null) => ({
   amount: '',
-  category: '',
+  category: resolveCategoryValue(categories || getBillCategories(auth.getCachedUser()), 'expense', ''),
   merchant: '',
   remark: '',
   date: formatDate(new Date()),
@@ -32,13 +34,26 @@ Page({
     showEditor: false,
     editingBillId: '',
     form: makeEmptyForm(),
-    categories: BILL_CATEGORIES,
+    categories: getBillCategories(auth.getCachedUser()),
   },
 
-  onShow() {
+  async onShow() {
     if (!auth.isLoggedIn()) {
       go(ROUTES.login, 'reLaunch');
       return;
+    }
+
+    const user = auth.getCachedUser();
+    if (user?.billCategories) {
+      this.setData({ categories: getBillCategories(user) });
+    } else {
+      const result = await categoryService.getBillCategories().catch(() => null);
+      if (result?.success && result.data?.user) {
+        this.setData({ categories: getBillCategories(result.data.user) });
+        if (app.setLoginState) {
+          app.setLoginState(result.data.user);
+        }
+      }
     }
 
     this.resetAndLoad();
@@ -92,7 +107,7 @@ Page({
       }));
 
       const mergedBills = page === 1 ? incoming : this.data.bills.concat(incoming);
-      const billGroups = groupBillsByDate(mergedBills);
+      const billGroups = groupBillsByDate(mergedBills, this.data.categories);
 
       this.setData({
         bills: mergedBills,
@@ -101,10 +116,7 @@ Page({
         hasMore: Boolean(result.data?.hasMore),
       });
     } catch (error) {
-      wx.showToast({
-        title: '加载失败',
-        icon: 'none',
-      });
+      wx.showToast({ title: '加载失败', icon: 'none' });
     } finally {
       this.setData({
         loading: false,
@@ -118,27 +130,21 @@ Page({
   },
 
   handleMonthChange(event) {
-    this.setData({
-      month: event.detail.value,
-    });
+    this.setData({ month: event.detail.value });
     this.resetAndLoad();
   },
 
   handleTypeChange(event) {
-    this.setData({
-      type: event.detail.type,
-    });
+    this.setData({ type: event.detail.type });
     this.resetAndLoad();
   },
 
   handleAdd() {
-    go(ROUTES.add, 'switchTab');
+    go(ROUTES.add, 'navigateTo');
   },
 
   handleFilterCurrentMonth() {
-    this.setData({
-      month: formatMonth(new Date()),
-    });
+    this.setData({ month: formatMonth(new Date()) });
     this.resetAndLoad();
   },
 
@@ -162,7 +168,7 @@ Page({
     this.setData({
       showEditor: false,
       editingBillId: '',
-      form: makeEmptyForm(),
+      form: makeEmptyForm(this.data.categories),
     });
   },
 
@@ -174,8 +180,10 @@ Page({
   },
 
   handleTypeChangeEditor(event) {
+    const type = event.detail.type;
     this.setData({
-      'form.type': event.detail.type,
+      'form.type': type,
+      'form.category': resolveCategoryValue(this.data.categories, type, this.data.form.category),
     });
   },
 
@@ -194,10 +202,7 @@ Page({
   async handleSaveEdit() {
     const check = validateBillForm(this.data.form);
     if (!check.ok) {
-      wx.showToast({
-        title: check.message,
-        icon: 'none',
-      });
+      wx.showToast({ title: check.message, icon: 'none' });
       return;
     }
 
@@ -211,23 +216,14 @@ Page({
       });
 
       if (result.success) {
-        wx.showToast({
-          title: '保存成功',
-          icon: 'success',
-        });
+        wx.showToast({ title: '保存成功', icon: 'success' });
         this.handleCloseEditor();
         this.resetAndLoad();
       } else {
-        wx.showToast({
-          title: '保存失败',
-          icon: 'none',
-        });
+        wx.showToast({ title: '保存失败', icon: 'none' });
       }
     } catch (error) {
-      wx.showToast({
-        title: '保存失败',
-        icon: 'none',
-      });
+      wx.showToast({ title: '保存失败', icon: 'none' });
     } finally {
       this.setData({ loading: false });
     }
@@ -247,24 +243,16 @@ Page({
       });
     });
 
-    if (!confirm) {
-      return;
-    }
+    if (!confirm) return;
 
     try {
       const result = await billService.deleteBill(id);
       if (result.success) {
-        wx.showToast({
-          title: '已删除',
-          icon: 'success',
-        });
+        wx.showToast({ title: '已删除', icon: 'success' });
         this.resetAndLoad();
       }
     } catch (error) {
-      wx.showToast({
-        title: '删除失败',
-        icon: 'none',
-      });
+      wx.showToast({ title: '删除失败', icon: 'none' });
     }
   },
 });

@@ -1,3 +1,4 @@
+const app = getApp();
 const auth = require('../../services/auth');
 const billService = require('../../services/bill');
 const reportService = require('../../services/report');
@@ -6,6 +7,7 @@ const { ROUTES, go } = require('../../utils/route');
 const { APP_NAME, OCR_SOURCES } = require('../../utils/config');
 const { formatDate, formatMonth, formatMoney } = require('../../utils/format');
 const { getOcrSourceMeta } = require('../../utils/ocr');
+const { getBillCategories } = require('../../utils/category');
 
 Page({
   data: {
@@ -23,16 +25,19 @@ Page({
     ocrResult: null,
     ocrError: '',
     ocrSources: OCR_SOURCES,
+    categories: getBillCategories(auth.getCachedUser()),
   },
 
-  onShow() {
+  async onShow() {
     if (!auth.isLoggedIn()) {
       go(ROUTES.login, 'reLaunch');
       return;
     }
 
+    const user = auth.getCachedUser();
     this.setData({
-      userInfo: auth.getCachedUser(),
+      userInfo: user,
+      categories: getBillCategories(user),
     });
 
     this.loadDashboard();
@@ -50,26 +55,10 @@ Page({
       const summary = summaryRes.data || {};
       this.setData({
         summaryCards: [
-          {
-            label: '本月支出',
-            value: `¥${formatMoney(summary.totalExpense)}`,
-            desc: `${summary.expenseCount || 0} 笔`,
-          },
-          {
-            label: '本月收入',
-            value: `¥${formatMoney(summary.totalIncome)}`,
-            desc: `${summary.incomeCount || 0} 笔`,
-          },
-          {
-            label: '月度结余',
-            value: `¥${formatMoney(summary.netAmount)}`,
-            desc: '收入 - 支出',
-          },
-          {
-            label: '今日消费',
-            value: `¥${formatMoney(summary.todayExpense)}`,
-            desc: `${summary.todayCount || 0} 笔`,
-          },
+          { label: '本月支出', value: `¥${formatMoney(summary.totalExpense)}`, desc: `${summary.expenseCount || 0} 笔` },
+          { label: '本月收入', value: `¥${formatMoney(summary.totalIncome)}`, desc: `${summary.incomeCount || 0} 笔` },
+          { label: '月度结余', value: `¥${formatMoney(summary.netAmount)}`, desc: '收入 - 支出' },
+          { label: '今日消费', value: `¥${formatMoney(summary.todayExpense)}`, desc: `${summary.todayCount || 0} 笔` },
         ],
         todayBills: (todayRes.data?.list || []).map((bill) => ({
           ...bill,
@@ -126,17 +115,21 @@ Page({
   handleQuickAction(event) {
     const { action } = event.detail || {};
 
-    if (action === 'add') go(ROUTES.add, 'switchTab');
+    if (action === 'add') go(ROUTES.add, 'navigateTo');
     if (action === 'upload') {
       this.handleUploadScreenshot();
     }
-    if (action === 'bills') go(ROUTES.bills, 'switchTab');
+    if (action === 'bills') go(ROUTES.bills, 'navigateTo');
     if (action === 'report') go(ROUTES.report, 'navigateTo');
-    if (action === 'stats') go(ROUTES.stats, 'switchTab');
+    if (action === 'stats') go(ROUTES.stats, 'navigateTo');
   },
 
   handleGoReport() {
     go(ROUTES.report, 'navigateTo');
+  },
+
+  handleOpenCategories() {
+    go(ROUTES.categories, 'navigateTo');
   },
 
   handleSelectOcrSource(event) {

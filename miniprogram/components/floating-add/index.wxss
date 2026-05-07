@@ -1,0 +1,33 @@
+.fab {
+  position: fixed;
+  right: 28rpx;
+  bottom: calc(126rpx + env(safe-area-inset-bottom));
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.fab__inner {
+  width: 108rpx;
+  height: 108rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+  color: #00111c;
+  font-size: 68rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 18rpx 36rpx rgba(14, 165, 233, 0.35);
+}
+
+.fab__label {
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  background: rgba(2, 6, 23, 0.64);
+  color: #e2e8f0;
+  font-size: 20rpx;
+  border: 1rpx solid rgba(148, 163, 184, 0.16);
+}

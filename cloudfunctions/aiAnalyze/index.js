@@ -17,7 +17,7 @@ const {
 const {
   checkAiPermission,
   consumeAiQuota,
-} = require('../shared/membership');
+} = require('../shared');
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV,
@@ -26,7 +26,20 @@ cloud.init({
 const db = cloud.database();
 const getOpenId = () => cloud.getWXContext().OPENID;
 
+const ensureCollection = async (name) => {
+  try {
+    await db.createCollection(name);
+  } catch (error) {
+    const errMsg = String(error?.errMsg || error?.message || error || '');
+    if (/resourceexist|already exists|table exist|collection already exists|已存在|exist/i.test(errMsg)) {
+      return;
+    }
+    throw error;
+  }
+};
+
 const queryBillsByMonths = async (months = []) => {
+  await ensureCollection(BILL_COLLECTION);
   const uniqMonths = [...new Set(months.filter(Boolean))];
   if (!uniqMonths.length) return [];
 
@@ -137,14 +150,17 @@ const chargeAiQuota = async (permission) => {
 };
 
 const analyze = async (data = {}) => {
-  const periodType = data.periodType === 'week' ? 'week' : 'month';
+  const periodType = data.periodType === 'week' ? 'week' : data.periodType === 'year' ? 'year' : 'month';
   const range = getDateRangeForPeriod({
     periodType,
     month: data.month,
+    year: data.year,
   });
 
   const currentMonths = getRangeMonths(range);
-  const previousMonths = [range.prevStartDate.slice(0, 7), range.prevEndDate.slice(0, 7)];
+  const previousMonths = range.periodType === 'year'
+    ? Array.from({ length: 12 }, (_, index) => `${String(Number(range.year) - 1)}-${String(index + 1).padStart(2, '0')}`)
+    : [range.prevStartDate.slice(0, 7), range.prevEndDate.slice(0, 7)];
 
   const [currentBills, previousBills] = await Promise.all([
     queryBillsByMonths(currentMonths),
@@ -209,6 +225,9 @@ exports.main = async (event) => {
   const action = event.action || 'analyze';
   const data = event.data || {};
 
+  await ensureCollection(AI_LOG_COLLECTION);
+  await ensureCollection(BILL_COLLECTION);
+
   if (action !== 'analyze') {
     return {
       success: false,
@@ -247,12 +266,13 @@ exports.main = async (event) => {
   }
 
   try {
-    const result = await analyze(data);
+  const result = await analyze(data);
 
     await saveAiLog({
       input: {
-        periodType: data.periodType === 'week' ? 'week' : 'month',
+        periodType,
         month: data.month || '',
+        year: data.year || '',
         seed: buildPromptSeed(result.seed),
       },
       output: {
@@ -270,7 +290,7 @@ exports.main = async (event) => {
     return {
       success: true,
       data: {
-        periodType: data.periodType === 'week' ? 'week' : 'month',
+        periodType,
         range: result.seed.range,
         summary: result.seed.summary,
         trend: result.seed.trend,

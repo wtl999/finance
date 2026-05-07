@@ -2,7 +2,7 @@ const APP_NAME = 'AI记账助手';
 
 module.exports = {
   APP_NAME,
-  CLOUD_ENV: '',
+  CLOUD_ENV: 'cloud1-d3gk0y3id5101462f',
   STORAGE_KEYS: {
     LOGIN_FLAG: 'finance.login.flag',
     USER_PROFILE: 'finance.user.profile',
@@ -11,6 +11,7 @@ module.exports = {
     LOGIN: 'login',
     USER_SYNC: 'userSync',
     BILL_SERVICE: 'billService',
+    CATEGORY_SERVICE: 'categoryService',
     REPORT_SERVICE: 'reportService',
     AI_CLASSIFY: 'aiClassify',
     AI_ANALYZE: 'aiAnalyze',

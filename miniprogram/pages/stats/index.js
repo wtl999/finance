@@ -1,10 +1,12 @@
 const auth = require('../../services/auth');
 const billService = require('../../services/bill');
 const reportService = require('../../services/report');
+const categoryService = require('../../services/category');
 const { ROUTES, go } = require('../../utils/route');
 const { formatMonth } = require('../../utils/format');
-const { aggregateStats, getMonthRange } = require('../../utils/stats');
+const { aggregateStats } = require('../../utils/stats');
 const { createPieOption, createTrendOption, createBarOption } = require('../../utils/chart');
+const { getBillCategories } = require('../../utils/category');
 
 Page({
   data: {
@@ -16,12 +18,23 @@ Page({
     categoryOption: null,
     weeklyOption: null,
     monthlyOption: null,
+    categories: getBillCategories(auth.getCachedUser()),
   },
 
-  onShow() {
+  async onShow() {
     if (!auth.isLoggedIn()) {
       go(ROUTES.login, 'reLaunch');
       return;
+    }
+
+    const user = auth.getCachedUser();
+    if (user?.billCategories) {
+      this.setData({ categories: getBillCategories(user) });
+    } else {
+      const result = await categoryService.getBillCategories().catch(() => null);
+      if (result?.success && result.data?.user) {
+        this.setData({ categories: getBillCategories(result.data.user) });
+      }
     }
 
     this.loadStats();
@@ -47,7 +60,7 @@ Page({
       ]);
 
       const bills = billResult.data?.list || [];
-      const stats = aggregateStats(bills, this.data.month);
+      const stats = aggregateStats(bills, { month: this.data.month });
 
       this.setData({
         summaryCards: stats.summaryCards,
@@ -62,15 +75,15 @@ Page({
         ),
         weeklyOption: createTrendOption({
           title: '周趋势',
-          xAxis: stats.weeklyTrend.xAxis,
-          expense: stats.weeklyTrend.expense,
-          income: stats.weeklyTrend.income,
+          xAxis: stats.trend.xAxis,
+          expense: stats.trend.expense,
+          income: stats.trend.income,
         }),
         monthlyOption: createBarOption({
           title: '月趋势',
-          xAxis: stats.monthlyTrend.xAxis,
-          expense: stats.monthlyTrend.expense,
-          income: stats.monthlyTrend.income,
+          xAxis: stats.periodTrend.xAxis,
+          expense: stats.periodTrend.expense,
+          income: stats.periodTrend.income,
         }),
       });
     } catch (error) {
@@ -87,9 +100,7 @@ Page({
   },
 
   handleMonthChange(event) {
-    this.setData({
-      month: event.detail.value,
-    });
+    this.setData({ month: event.detail.value });
     this.loadStats();
   },
 

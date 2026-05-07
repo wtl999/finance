@@ -12,7 +12,22 @@
     </view>
   </view>
 
-  <t-card title="本月支出统计" extra="{{month}}">
+  <view class="hero-rail">
+    <view class="hero-rail__item">
+      <view class="hero-rail__label">本月支出</view>
+      <view class="hero-rail__value">{{summaryCards[0].value}}</view>
+    </view>
+    <view class="hero-rail__item">
+      <view class="hero-rail__label">本月收入</view>
+      <view class="hero-rail__value">{{summaryCards[1].value}}</view>
+    </view>
+    <view class="hero-rail__item">
+      <view class="hero-rail__label">净结余</view>
+      <view class="hero-rail__value">{{summaryCards[2].value}}</view>
+    </view>
+  </view>
+
+  <t-card title="本月收支统计" extra="{{month}}">
     <stat-grid items="{{summaryCards}}" />
   </t-card>
 
@@ -30,17 +45,18 @@
       <view class="ai-box__actions">
         <t-button bindtap="handleAiAnalyze">AI 分析</t-button>
         <t-button theme="ghost" bindtap="handleGoReport">查看月报</t-button>
+        <t-button theme="ghost" bindtap="handleOpenCategories">管理分类</t-button>
       </view>
     </view>
   </t-card>
 
   <view class="spacer"></view>
 
-  <t-section title="快速入口" extra="TabBar">
+  <t-section title="快捷入口" extra="TabBar">
     <view class="action-grid">
       <quick-action action="add" label="快速记账" hint="新增账单" tone="cyan" bindtap="handleQuickAction" />
       <quick-action action="upload" label="上传截图" hint="OCR 预留" tone="emerald" bindtap="handleQuickAction" />
-      <quick-action action="bills" label="查看账单" hint="列表过滤" tone="violet" bindtap="handleQuickAction" />
+      <quick-action action="bills" label="查看账单" hint="列表筛选" tone="violet" bindtap="handleQuickAction" />
       <quick-action action="report" label="AI 分析" hint="生成月报" tone="rose" bindtap="handleQuickAction" />
     </view>
   </t-section>
@@ -49,7 +65,7 @@
 
   <t-card title="今日消费卡片" extra="{{today}}">
     <view wx:if="{{todayBills.length}}">
-      <bill-item wx:for="{{todayBills}}" wx:key="_id" bill="{{item}}" />
+      <bill-item wx:for="{{todayBills}}" wx:key="_id" bill="{{item}}" categories="{{categories}}" />
     </view>
     <t-empty wx:else title="今天还没有消费" description="记录第一笔账单后会显示在这里。" />
   </t-card>
@@ -98,4 +114,6 @@
       <t-empty wx:elif="{{ocrError}}" title="识别失败" description="{{ocrError}}" />
     </view>
   </t-card>
+
+  <floating-add />
 </view>

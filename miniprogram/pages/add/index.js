@@ -1,30 +1,59 @@
+const app = getApp();
 const auth = require('../../services/auth');
 const billService = require('../../services/bill');
 const aiService = require('../../services/ai');
+const categoryService = require('../../services/category');
 const { ROUTES, go } = require('../../utils/route');
 const { formatDate } = require('../../utils/format');
 const { validateBillForm } = require('../../utils/validators');
-const { BILL_CATEGORIES } = require('../../utils/config');
+const { getBillCategories, resolveCategoryValue } = require('../../utils/category');
+
+const makeEmptyForm = (categories = null) => {
+  const categoryGroups = categories || getBillCategories(auth.getCachedUser());
+  return {
+    amount: '',
+    category: resolveCategoryValue(categoryGroups, 'expense', ''),
+    merchant: '',
+    remark: '',
+    date: formatDate(new Date()),
+    type: 'expense',
+  };
+};
 
 Page({
   data: {
-    categories: BILL_CATEGORIES,
+    categories: getBillCategories(auth.getCachedUser()),
     loading: false,
     aiLoading: false,
-    form: {
-      amount: '',
-      category: '',
-      merchant: '',
-      remark: '',
-      date: formatDate(new Date()),
-      type: 'expense',
-    },
+    form: makeEmptyForm(),
   },
 
-  onShow() {
+  async onShow() {
     if (!auth.isLoggedIn()) {
       go(ROUTES.login, 'reLaunch');
+      return;
     }
+
+    const user = auth.getCachedUser();
+    if (user?.billCategories) {
+      this.setData({
+        categories: getBillCategories(user),
+      });
+    } else {
+      const result = await categoryService.getBillCategories().catch(() => null);
+      if (result?.success && result.data?.user) {
+        this.setData({
+          categories: getBillCategories(result.data.user),
+        });
+        if (app.setLoginState) {
+          app.setLoginState(result.data.user);
+        }
+      }
+    }
+
+    this.setData({
+      form: makeEmptyForm(this.data.categories),
+    });
   },
 
   handleInput(event) {
@@ -35,8 +64,11 @@ Page({
   },
 
   handleTypeChange(event) {
+    const type = event.detail.type;
+    const nextCategory = resolveCategoryValue(this.data.categories, type, this.data.form.category);
     this.setData({
-      'form.type': event.detail.type,
+      'form.type': type,
+      'form.category': nextCategory,
     });
   },
 
@@ -67,7 +99,11 @@ Page({
     this.setData({ aiLoading: true });
 
     try {
-      const result = await aiService.classifyBillText({ text });
+      const result = await aiService.classifyBillText({
+        text,
+        categories: this.data.categories,
+      });
+
       if (result.success && result.data) {
         this.setData({
           'form.category': result.data.category || this.data.form.category,
@@ -114,16 +150,9 @@ Page({
           icon: 'success',
         });
         this.setData({
-          form: {
-            amount: '',
-            category: '',
-            merchant: '',
-            remark: '',
-            date: formatDate(new Date()),
-            type: 'expense',
-          },
+          form: makeEmptyForm(this.data.categories),
         });
-        go(ROUTES.bills, 'switchTab');
+        go(ROUTES.bills, 'navigateTo');
         return;
       }
 

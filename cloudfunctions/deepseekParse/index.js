@@ -18,7 +18,7 @@ const {
 const {
   checkAiPermission,
   consumeAiQuota,
-} = require('../shared/membership');
+} = require('../shared');
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV,
