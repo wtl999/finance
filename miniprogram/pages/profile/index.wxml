@@ -1,0 +1,43 @@
+<view class="page profile-page safe-bottom">
+  <profile-summary user="{{userInfo}}" />
+
+  <view class="spacer"></view>
+
+  <t-card title="本月概览" extra="{{month}}">
+    <view class="stats">
+      <view wx:for="{{profileCards}}" wx:key="label" class="stats__item">
+        <view class="stats__label">{{item.label}}</view>
+        <view class="stats__value">{{item.value}}</view>
+        <view class="stats__desc">{{item.desc}}</view>
+      </view>
+    </view>
+  </t-card>
+
+  <view class="spacer"></view>
+
+  <t-card title="操作" extra="快捷入口">
+    <view class="menu">
+      <view class="menu__item" bindtap="handleExport">
+        <view class="menu__main">
+          <view class="menu__title">导出账单</view>
+          <view class="menu__desc">导出当前月账单为 CSV</view>
+        </view>
+        <view class="menu__arrow">›</view>
+      </view>
+      <view class="menu__item" bindtap="handleSettings">
+        <view class="menu__main">
+          <view class="menu__title">设置入口</view>
+          <view class="menu__desc">同步状态 / 清理缓存</view>
+        </view>
+        <view class="menu__arrow">›</view>
+      </view>
+      <view class="menu__item" bindtap="handleAbout">
+        <view class="menu__main">
+          <view class="menu__title">关于</view>
+          <view class="menu__desc">查看产品说明</view>
+        </view>
+        <view class="menu__arrow">›</view>
+      </view>
+    </view>
+  </t-card>
+</view>

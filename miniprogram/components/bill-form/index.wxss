@@ -1,0 +1,84 @@
+.bill-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22rpx;
+}
+
+.bill-form__row {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.bill-form__label {
+  font-size: 24rpx;
+  color: #94a3b8;
+}
+
+.bill-form__input,
+.bill-form__textarea,
+.bill-form__picker {
+  width: 100%;
+  min-height: 76rpx;
+  padding: 18rpx 20rpx;
+  border-radius: 20rpx;
+  background: rgba(2, 6, 23, 0.4);
+  border: 1rpx solid rgba(148, 163, 184, 0.16);
+  color: #f8fafc;
+  font-size: 26rpx;
+}
+
+.bill-form__textarea {
+  min-height: 140rpx;
+}
+
+.bill-form__picker {
+  display: flex;
+  align-items: center;
+}
+
+.bill-form__type-row {
+  display: flex;
+  gap: 14rpx;
+}
+
+.bill-form__type,
+.bill-form__category {
+  border-radius: 18rpx;
+  padding: 14rpx 18rpx;
+  background: rgba(148, 163, 184, 0.08);
+  color: #cbd5e1;
+  font-size: 22rpx;
+}
+
+.bill-form__type.is-active,
+.bill-form__category.is-active {
+  background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+  color: #00111c;
+  font-weight: 600;
+}
+
+.bill-form__category-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.bill-form__category--orange.is-active,
+.bill-form__category--blue.is-active,
+.bill-form__category--violet.is-active,
+.bill-form__category--emerald.is-active,
+.bill-form__category--pink.is-active,
+.bill-form__category--cyan.is-active,
+.bill-form__category--amber.is-active,
+.bill-form__category--green.is-active,
+.bill-form__category--slate.is-active,
+.bill-form__category--gray.is-active {
+  color: #00111c;
+}
+
+.bill-form__actions {
+  display: flex;
+  gap: 14rpx;
+  margin-top: 8rpx;
+}

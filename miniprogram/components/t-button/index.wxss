@@ -1,0 +1,31 @@
+.button {
+  min-width: 160rpx;
+  height: 76rpx;
+  line-height: 76rpx;
+  border-radius: 20rpx;
+  font-size: 26rpx;
+  padding: 0 24rpx;
+}
+
+.button--block {
+  width: 100%;
+}
+
+.button--primary {
+  color: #00111c;
+  background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 100%);
+}
+
+.button--ghost {
+  color: #e2e8f0;
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.button--danger {
+  color: #fff;
+  background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
+}
+
+.button--disabled {
+  opacity: 0.45;
+}

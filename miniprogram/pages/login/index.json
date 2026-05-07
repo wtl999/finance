@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "t-card": "/components/t-card/index",
+    "t-button": "/components/t-button/index",
+    "t-section": "/components/t-section/index"
+  }
+}

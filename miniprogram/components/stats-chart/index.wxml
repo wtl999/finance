@@ -1,0 +1,9 @@
+<view class="stats-chart">
+  <view class="stats-chart__head">
+    <view class="stats-chart__title">{{title}}</view>
+    <view wx:if="{{subtitle}}" class="stats-chart__subtitle">{{subtitle}}</view>
+  </view>
+  <view class="stats-chart__body" style="height: {{height}}rpx;">
+    <ec-canvas class="stats-chart__canvas" ec="{{ec}}" />
+  </view>
+</view>

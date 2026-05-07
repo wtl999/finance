@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "t-card": "/components/t-card/index",
+    "bill-form": "/components/bill-form/index"
+  }
+}

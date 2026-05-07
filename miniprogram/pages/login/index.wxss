@@ -1,0 +1,62 @@
+.login-page {
+  padding-top: 120rpx;
+}
+
+.hero {
+  margin-bottom: 32rpx;
+}
+
+.hero__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  background: rgba(56, 189, 248, 0.12);
+  color: #7dd3fc;
+  font-size: 22rpx;
+  letter-spacing: 1rpx;
+}
+
+.hero__title {
+  margin-top: 22rpx;
+  font-size: 56rpx;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #f8fafc;
+}
+
+.hero__desc {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  line-height: 1.7;
+  color: #94a3b8;
+}
+
+.login-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.login-card__line {
+  font-size: 24rpx;
+  color: #cbd5e1;
+}
+
+.login-card__actions {
+  margin-top: 16rpx;
+}
+
+.rules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.rules__item {
+  padding: 12rpx 18rpx;
+  border-radius: 999rpx;
+  background: rgba(148, 163, 184, 0.12);
+  color: #cbd5e1;
+  font-size: 22rpx;
+}

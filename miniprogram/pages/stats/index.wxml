@@ -1,0 +1,59 @@
+<view class="page stats-page safe-bottom">
+  <t-card title="统计中心" extra="ECharts">
+    <view class="topbar">
+      <picker mode="date" fields="month" value="{{month}}" bindchange="handleMonthChange">
+        <view class="topbar__picker">{{month}}</view>
+      </picker>
+      <t-button theme="ghost" bindtap="handleGoReport">AI 洞察</t-button>
+    </view>
+  </t-card>
+
+  <view class="spacer"></view>
+
+  <t-card title="本月概览" extra="Summary">
+    <stat-grid items="{{summaryCards}}" />
+  </t-card>
+
+  <view class="spacer"></view>
+
+  <view class="chart-stack">
+    <t-card title="分类占比" extra="Top spending">
+      <stats-chart
+        title="分类占比"
+        subtitle="本月支出分布"
+        option="{{categoryOption}}"
+        height="560"
+      />
+    </t-card>
+
+    <t-card title="周趋势" extra="7 days">
+      <stats-chart
+        title="周趋势"
+        subtitle="最近 7 天收入 / 支出"
+        option="{{weeklyOption}}"
+        height="420"
+      />
+    </t-card>
+
+    <t-card title="月趋势" extra="Daily view">
+      <stats-chart
+        title="月趋势"
+        subtitle="按天对比收入 / 支出"
+        option="{{monthlyOption}}"
+        height="520"
+      />
+    </t-card>
+  </view>
+
+  <view class="spacer"></view>
+
+  <t-card title="AI 消费洞察" extra="Summary">
+    <view wx:if="{{insight}}" class="insight">
+      <view class="insight__title">{{insight.summaryText}}</view>
+      <view class="insight__body">{{insight.adviceText}}</view>
+      <view class="insight__body">{{insight.trendText}}</view>
+      <view class="insight__tag">{{insight.tagText}}</view>
+    </view>
+    <t-empty wx:else title="暂无洞察" description="记录更多账单后，AI 洞察会更完整。" />
+  </t-card>
+</view>

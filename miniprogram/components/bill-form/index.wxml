@@ -1,0 +1,51 @@
+<view class="bill-form">
+  <view class="bill-form__row">
+    <view class="bill-form__label">金额</view>
+    <input class="bill-form__input" type="digit" placeholder="请输入金额" value="{{form.amount}}" bindinput="handleAmountInput" />
+  </view>
+
+  <view class="bill-form__row">
+    <view class="bill-form__label">类型</view>
+    <view class="bill-form__type-row">
+      <view class="bill-form__type {{form.type === 'expense' ? 'is-active' : ''}}" data-type="expense" bindtap="handleTypeChange">支出</view>
+      <view class="bill-form__type {{form.type === 'income' ? 'is-active' : ''}}" data-type="income" bindtap="handleTypeChange">收入</view>
+    </view>
+  </view>
+
+  <view class="bill-form__row">
+    <view class="bill-form__label">分类</view>
+    <view class="bill-form__category-grid">
+      <view
+        wx:for="{{categories}}"
+        wx:key="value"
+        class="bill-form__category {{form.category === item.value ? 'is-active' : ''}} bill-form__category--{{item.tone || 'gray'}}"
+        data-value="{{item.value}}"
+        bindtap="handleCategoryTap"
+      >
+        {{item.label}}
+      </view>
+    </view>
+  </view>
+
+  <view class="bill-form__row">
+    <view class="bill-form__label">商户</view>
+    <input class="bill-form__input" placeholder="例如：星巴克" value="{{form.merchant}}" bindinput="handleMerchantInput" />
+  </view>
+
+  <view class="bill-form__row">
+    <view class="bill-form__label">备注</view>
+    <textarea class="bill-form__textarea" placeholder="选填" value="{{form.remark}}" bindinput="handleRemarkInput"></textarea>
+  </view>
+
+  <view class="bill-form__row">
+    <view class="bill-form__label">日期</view>
+    <picker mode="date" value="{{form.date}}" bindchange="handleDateChange">
+      <view class="bill-form__picker">{{form.date}}</view>
+    </picker>
+  </view>
+
+  <view class="bill-form__actions">
+    <t-button theme="ghost" loading="{{aiLoading}}" bindtap="handleAiClassify">AI 自动分类</t-button>
+    <t-button block loading="{{loading}}" bindtap="handleSubmit">保存到账单数据库</t-button>
+  </view>
+</view>

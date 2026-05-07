@@ -1,0 +1,11 @@
+{
+  "usingComponents": {
+    "t-card": "/components/t-card/index",
+    "t-empty": "/components/t-empty/index",
+    "t-button": "/components/t-button/index",
+    "bill-item": "/components/bill-item/index",
+    "bill-form": "/components/bill-form/index"
+  },
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 120
+}

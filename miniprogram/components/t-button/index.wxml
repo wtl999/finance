@@ -1,0 +1,9 @@
+<button
+  class="button button--{{theme}} {{block ? 'button--block' : ''}} {{disabled ? 'button--disabled' : ''}}"
+  loading="{{loading}}"
+  disabled="{{disabled}}"
+  size="mini"
+  bindtap="handleTap"
+>
+  <slot>{{text}}</slot>
+</button>

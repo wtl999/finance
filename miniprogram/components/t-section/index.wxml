@@ -1,0 +1,9 @@
+<view class="section">
+  <view class="section__header">
+    <view class="section__title">{{title}}</view>
+    <view class="section__extra">{{extra}}</view>
+  </view>
+  <view class="section__body">
+    <slot></slot>
+  </view>
+</view>

@@ -1,0 +1,55 @@
+const APP_NAME = 'AI记账助手';
+
+module.exports = {
+  APP_NAME,
+  CLOUD_ENV: '',
+  STORAGE_KEYS: {
+    LOGIN_FLAG: 'finance.login.flag',
+    USER_PROFILE: 'finance.user.profile',
+  },
+  CLOUD_FUNCTIONS: {
+    LOGIN: 'login',
+    USER_SYNC: 'userSync',
+    BILL_SERVICE: 'billService',
+    REPORT_SERVICE: 'reportService',
+    AI_CLASSIFY: 'aiClassify',
+    AI_ANALYZE: 'aiAnalyze',
+    OCR: 'ocr',
+    DEEPSEEK_BILL_PARSE: 'deepseekParse',
+  },
+  OCR_SOURCES: [
+    { label: '微信支付', value: 'wechat', tone: 'blue' },
+    { label: '支付宝', value: 'alipay', tone: 'cyan' },
+    { label: '美团订单', value: 'meituan', tone: 'orange' },
+  ],
+  OCR_CACHE_COLLECTION: 'ocr_logs',
+  AI_LOG_COLLECTION: 'ai_logs',
+  BILL_PARSE_CATEGORIES: [
+    '餐饮',
+    '交通',
+    '购物',
+    '住房',
+    '娱乐',
+    '医疗',
+    '教育',
+    '工资',
+    '理财',
+    '其他',
+  ],
+  BILL_TYPES: [
+    { label: '支出', value: 'expense' },
+    { label: '收入', value: 'income' },
+  ],
+  BILL_CATEGORIES: [
+    { label: '餐饮', value: '餐饮', tone: 'orange' },
+    { label: '交通', value: '交通', tone: 'blue' },
+    { label: '购物', value: '购物', tone: 'violet' },
+    { label: '住房', value: '住房', tone: 'emerald' },
+    { label: '娱乐', value: '娱乐', tone: 'pink' },
+    { label: '医疗', value: '医疗', tone: 'cyan' },
+    { label: '教育', value: '教育', tone: 'amber' },
+    { label: '工资', value: '工资', tone: 'green' },
+    { label: '理财', value: '理财', tone: 'slate' },
+    { label: '其他', value: '其他', tone: 'gray' },
+  ],
+};

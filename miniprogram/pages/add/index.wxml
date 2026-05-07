@@ -1,0 +1,16 @@
+<view class="page add-page safe-bottom">
+  <t-card title="添加账单" extra="写入 bills collection">
+    <bill-form
+      form="{{form}}"
+      categories="{{categories}}"
+      loading="{{loading}}"
+      aiLoading="{{aiLoading}}"
+      bind:fieldchange="handleInput"
+      bind:typechange="handleTypeChange"
+      bind:categorychange="handleCategoryTap"
+      bind:datechange="handleDateChange"
+      bind:aiclassify="handleAiClassify"
+      bind:submit="handleSubmit"
+    />
+  </t-card>
+</view>

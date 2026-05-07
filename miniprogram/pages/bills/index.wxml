@@ -1,0 +1,72 @@
+<view class="page bills-page safe-bottom">
+  <t-card title="账单列表" extra="时间轴">
+    <view class="filter">
+      <picker mode="date" fields="month" value="{{month}}" bindchange="handleMonthChange">
+        <view class="filter__picker">{{month}}</view>
+      </picker>
+
+      <view class="filter__types">
+        <view class="filter__type {{type === 'all' ? 'is-active' : ''}}" data-type="all" bindtap="handleTypeChange">全部</view>
+        <view class="filter__type {{type === 'expense' ? 'is-active' : ''}}" data-type="expense" bindtap="handleTypeChange">支出</view>
+        <view class="filter__type {{type === 'income' ? 'is-active' : ''}}" data-type="income" bindtap="handleTypeChange">收入</view>
+      </view>
+    </view>
+  </t-card>
+
+  <view class="spacer"></view>
+
+  <view wx:if="{{billGroups.length}}" class="timeline">
+    <view wx:for="{{billGroups}}" wx:key="date" class="timeline__group">
+      <view class="timeline__head">
+        <view class="timeline__dot"></view>
+        <view class="timeline__date">{{item.dateText}}</view>
+        <view class="timeline__summary">{{item.count}} 笔 · ¥{{item.totalAmount.toFixed(2)}}</view>
+      </view>
+      <view class="timeline__body">
+        <view wx:for="{{item.bills}}" wx:key="_id" class="timeline__item">
+          <bill-item
+            bill="{{item}}"
+            showEdit
+            showDelete
+            bind:edit="handleEdit"
+            bind:delete="handleDelete"
+          />
+        </view>
+      </view>
+    </view>
+
+    <view class="load-more">
+      <view wx:if="{{loadingMore}}" class="load-more__text">加载中...</view>
+      <view wx:elif="{{hasMore}}" class="load-more__text">下拉刷新查看更多，或上拉加载下一页</view>
+      <view wx:else class="load-more__text">没有更多账单了</view>
+    </view>
+  </view>
+
+  <t-card wx:else title="账单明细" extra="0 笔">
+    <t-empty title="没有账单" description="先去添加一笔账单。"></t-empty>
+  </t-card>
+
+  <view class="bottom-actions">
+    <t-button block bindtap="handleAdd">去添加账单</t-button>
+  </view>
+
+  <view wx:if="{{showEditor}}" class="editor-mask" bindtap="handleCloseEditor">
+    <view class="editor-sheet" catchtap="true">
+      <view class="editor-sheet__head">
+        <view class="editor-sheet__title">编辑账单</view>
+        <view class="editor-sheet__close" bindtap="handleCloseEditor">关闭</view>
+      </view>
+      <bill-form
+        form="{{form}}"
+        categories="{{categories}}"
+        loading="{{loading}}"
+        aiLoading="{{false}}"
+        bind:fieldchange="handleFieldChange"
+        bind:typechange="handleTypeChangeEditor"
+        bind:categorychange="handleCategoryChange"
+        bind:datechange="handleDateChange"
+        bind:submit="handleSaveEdit"
+      />
+    </view>
+  </view>
+</view>

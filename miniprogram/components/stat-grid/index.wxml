@@ -1,0 +1,7 @@
+<view class="grid">
+  <view wx:for="{{items}}" wx:key="label" class="grid__item">
+    <view class="grid__label">{{item.label}}</view>
+    <view class="grid__value">{{item.value}}</view>
+    <view wx:if="{{item.desc}}" class="grid__desc">{{item.desc}}</view>
+  </view>
+</view>

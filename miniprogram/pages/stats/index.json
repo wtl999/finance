@@ -1,0 +1,10 @@
+{
+  "usingComponents": {
+    "t-card": "/components/t-card/index",
+    "t-empty": "/components/t-empty/index",
+    "t-button": "/components/t-button/index",
+    "stat-grid": "/components/stat-grid/index",
+    "stats-chart": "/components/stats-chart/index"
+  },
+  "enablePullDownRefresh": true
+}

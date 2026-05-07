@@ -1,0 +1,30 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx;
+}
+
+.grid__item {
+  padding: 22rpx;
+  border-radius: 24rpx;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1rpx solid rgba(148, 163, 184, 0.14);
+}
+
+.grid__label {
+  font-size: 22rpx;
+  color: #94a3b8;
+}
+
+.grid__value {
+  margin-top: 10rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.grid__desc {
+  margin-top: 6rpx;
+  font-size: 20rpx;
+  color: #7dd3fc;
+}

@@ -1,0 +1,21 @@
+<view class="bill">
+  <view class="bill__icon bill__icon--{{normalizedBill.categoryMeta.tone || 'gray'}}">
+    {{normalizedBill.iconText}}
+  </view>
+  <view class="bill__body">
+    <view class="bill__title">
+      {{normalizedBill.categoryMeta.label || normalizedBill.category || '未分类'}}
+      <text wx:if="{{normalizedBill.merchant}}" class="bill__merchant"> · {{normalizedBill.merchant}}</text>
+    </view>
+    <view class="bill__meta">{{normalizedBill.dateText}} · {{normalizedBill.remark || '无备注'}}</view>
+  </view>
+  <view class="bill__right">
+    <view class="bill__amount bill__amount--{{normalizedBill.type || 'expense'}}">
+      {{normalizedBill.type === 'income' ? '+' : '-'}}{{normalizedBill.amountText}}
+    </view>
+    <view class="bill__actions">
+      <button wx:if="{{showEdit}}" class="bill__action" bindtap="handleEdit">编辑</button>
+      <button wx:if="{{showDelete}}" class="bill__action bill__action--danger" bindtap="handleDelete">删除</button>
+    </view>
+  </view>
+</view>

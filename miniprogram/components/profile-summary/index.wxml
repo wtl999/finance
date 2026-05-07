@@ -1,0 +1,25 @@
+<view class="profile-summary">
+  <view class="profile-summary__card">
+    <view class="profile-summary__avatar">
+      <image
+        wx:if="{{user.avatarUrl}}"
+        class="profile-summary__avatar-img"
+        src="{{user.avatarUrl}}"
+        mode="aspectFill"
+      />
+      <view wx:else class="profile-summary__avatar-fallback">{{initial}}</view>
+    </view>
+
+    <view class="profile-summary__body">
+      <view class="profile-summary__name-row">
+        <view class="profile-summary__name">{{user.nickname || '微信用户'}}</view>
+        <view class="profile-summary__tag">{{user.memberLabel || '免费'}}</view>
+      </view>
+      <view class="profile-summary__sub">AI {{quotaText}}</view>
+      <view class="profile-summary__meta">
+        <view class="profile-summary__chip">状态 {{statusText}}</view>
+        <view class="profile-summary__chip">额度 {{user.aiUnlimited ? '∞' : user.aiQuotaRemainingText || '0'}}</view>
+      </view>
+    </view>
+  </view>
+</view>

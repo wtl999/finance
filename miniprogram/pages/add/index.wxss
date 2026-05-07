@@ -1,0 +1,75 @@
+.add-page {
+  padding-top: 16rpx;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 22rpx;
+}
+
+.form__row {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.field-label {
+  font-size: 24rpx;
+  color: #94a3b8;
+}
+
+.field-input,
+.field-textarea,
+.picker-value {
+  width: 100%;
+  min-height: 76rpx;
+  padding: 18rpx 20rpx;
+  border-radius: 20rpx;
+  background: rgba(2, 6, 23, 0.4);
+  border: 1rpx solid rgba(148, 163, 184, 0.16);
+  color: #f8fafc;
+  font-size: 26rpx;
+}
+
+.field-textarea {
+  min-height: 140rpx;
+}
+
+.picker-value {
+  display: flex;
+  align-items: center;
+}
+
+.type-row {
+  display: flex;
+  gap: 14rpx;
+}
+
+.type-chip,
+.category-chip {
+  border-radius: 18rpx;
+  padding: 14rpx 18rpx;
+  background: rgba(148, 163, 184, 0.08);
+  color: #cbd5e1;
+  font-size: 22rpx;
+}
+
+.type-chip.is-active,
+.category-chip.is-active {
+  background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+  color: #00111c;
+  font-weight: 600;
+}
+
+.category-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.form__actions {
+  display: flex;
+  gap: 14rpx;
+  margin-top: 8rpx;
+}

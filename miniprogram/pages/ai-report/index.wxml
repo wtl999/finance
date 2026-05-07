@@ -1,0 +1,124 @@
+<view class="page report-page safe-bottom">
+  <view class="hero">
+    <view class="hero__title">AI 消费分析</view>
+    <view class="hero__subtitle">{{analysis.ui.subtitle || '周报 / 月报 / 高频行为分析'}}</view>
+    <view class="hero__meta">
+      <view class="hero__badge">{{analysis.ui.badge || '月报'}}</view>
+      <view class="hero__range">{{rangeLabel || '自动分析近周期数据'}}</view>
+    </view>
+  </view>
+
+  <view class="toolbar">
+    <view class="segmented">
+      <view
+        class="segmented__item {{periodType === 'week' ? 'segmented__item--active' : ''}}"
+        data-value="week"
+        bindtap="handlePeriodChange"
+      >
+        周报
+      </view>
+      <view
+        class="segmented__item {{periodType === 'month' ? 'segmented__item--active' : ''}}"
+        data-value="month"
+        bindtap="handlePeriodChange"
+      >
+        月报
+      </view>
+    </view>
+    <picker mode="date" fields="month" value="{{month}}" bindchange="handleMonthChange">
+      <view class="toolbar__picker">{{month}}</view>
+    </picker>
+    <t-button loading="{{loading}}" bindtap="handleAnalyze">重新分析</t-button>
+  </view>
+
+  <view class="spacer"></view>
+
+  <t-card title="核心概览" extra="AI + 聚合数据">
+    <view wx:if="{{analysis}}" class="overview">
+      <view class="overview__text">{{analysis.overview}}</view>
+      <view class="overview__text overview__text--muted">{{analysis.trend.detail}}</view>
+      <view class="overview__text overview__text--muted">{{analysis.budgetForecast.suggestion}}</view>
+    </view>
+    <t-empty wx:else title="暂无分析结果" description="请先记录账单，再生成周报或月报。"></t-empty>
+  </t-card>
+
+  <view class="spacer"></view>
+
+  <t-card title="关键指标" extra="Summary">
+    <stat-grid items="{{summaryCards}}" />
+  </t-card>
+
+  <view class="spacer"></view>
+
+  <view wx:if="{{trendOption}}">
+    <t-card title="消费趋势" extra="Trend">
+      <stats-chart
+        title="消费趋势"
+        subtitle="支出 / 收入变化"
+        option="{{trendOption}}"
+        height="420"
+      />
+    </t-card>
+  </view>
+
+  <view class="spacer"></view>
+
+  <t-card title="异常消费" extra="Alerts">
+    <view wx:if="{{anomalies.length}}" class="list">
+      <view wx:for="{{anomalies}}" wx:key="date" class="list__item list__item--alert">
+        <view class="list__main">
+          <view class="list__title">{{item.category}} · {{item.merchant || '未知商户'}}</view>
+          <view class="list__desc">{{item.date}} · {{item.reason}}</view>
+        </view>
+        <view class="list__meta">
+          <view class="list__amount">¥{{item.amount}}</view>
+          <view class="list__tag list__tag--{{item.severity}}">{{item.severityText}}</view>
+        </view>
+      </view>
+    </view>
+    <t-empty wx:else title="暂无异常消费" description="当前周期没有明显的异常单笔支出。"></t-empty>
+  </t-card>
+
+  <view class="spacer"></view>
+
+  <t-card title="分类变化" extra="Category">
+    <view wx:if="{{categoryChanges.length}}" class="list">
+      <view wx:for="{{categoryChanges}}" wx:key="category" class="list__item">
+        <view class="list__main">
+          <view class="list__title">{{item.category}}</view>
+          <view class="list__desc">本期 ¥{{item.current}} · 上期 ¥{{item.previous}}</view>
+        </view>
+        <view class="list__meta">
+          <view class="list__amount list__amount--{{item.direction}}">{{item.direction === 'up' ? '+' : item.direction === 'down' ? '-' : ''}}{{item.delta}}</view>
+          <view class="list__tag">{{item.changeRateText || item.changeRate}}</view>
+        </view>
+      </view>
+    </view>
+    <t-empty wx:else title="暂无分类变化" description="请继续积累账单，系统会自动生成分类变化分析。"></t-empty>
+  </t-card>
+
+  <view class="spacer"></view>
+
+  <t-card title="高频行为" extra="Patterns">
+    <view wx:if="{{highFrequency.length}}" class="frequency">
+      <view wx:for="{{highFrequency}}" wx:key="label" class="frequency__item">
+        <view class="frequency__head">
+          <view class="frequency__label">{{item.label}}</view>
+          <view class="frequency__value">¥{{item.amount}}</view>
+        </view>
+        <view class="frequency__desc">{{item.behavior}}</view>
+        <view class="frequency__hint">{{item.suggestion}}</view>
+      </view>
+    </view>
+    <t-empty wx:else title="暂无高频行为" description="当前周期未形成明显高频消费模式。"></t-empty>
+  </t-card>
+
+  <view class="spacer"></view>
+
+  <t-card title="AI 建议" extra="Action">
+    <view wx:if="{{actionItems.length}}" class="actions">
+      <view wx:for="{{actionItems}}" wx:key="*this" class="actions__item">{{item}}</view>
+    </view>
+    <t-empty wx:else title="暂无建议" description="分析完成后会自动输出可执行建议。"></t-empty>
+  </t-card>
+</view>

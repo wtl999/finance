@@ -1,0 +1,59 @@
+{
+  "pages": [
+    "pages/login/index",
+    "pages/index/index",
+    "pages/add/index",
+    "pages/bills/index",
+    "pages/stats/index",
+    "pages/profile/index",
+    "pages/ai-report/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "AI记账助手",
+    "navigationBarBackgroundColor": "#0b1220",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0b1220",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#94a3b8",
+    "selectedColor": "#38bdf8",
+    "backgroundColor": "#0b1220",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/icons/home.png",
+        "selectedIconPath": "images/icons/home-active.png"
+      },
+      {
+        "pagePath": "pages/add/index",
+        "text": "记账",
+        "iconPath": "images/icons/goods.png",
+        "selectedIconPath": "images/icons/goods-active.png"
+      },
+      {
+        "pagePath": "pages/bills/index",
+        "text": "账单",
+        "iconPath": "images/icons/business.png",
+        "selectedIconPath": "images/icons/business-active.png"
+      },
+      {
+        "pagePath": "pages/stats/index",
+        "text": "统计",
+        "iconPath": "images/icons/examples.png",
+        "selectedIconPath": "images/icons/examples-active.png"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的",
+        "iconPath": "images/icons/usercenter.png",
+        "selectedIconPath": "images/icons/usercenter-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,4 @@
+<view class="action action--{{tone}}" bindtap="handleTap">
+  <view class="action__label">{{label}}</view>
+  <view wx:if="{{hint}}" class="action__hint">{{hint}}</view>
+</view>

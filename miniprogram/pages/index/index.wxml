@@ -1,0 +1,101 @@
+<view class="page index-page safe-bottom">
+  <view class="hero">
+    <view class="hero__top">
+      <view>
+        <view class="hero__hello">你好，{{userInfo.nickname || '微信用户'}}</view>
+        <view class="hero__sub">今天适合把账记清楚。</view>
+      </view>
+      <view class="hero__avatar">
+        <image wx:if="{{userInfo.avatarUrl}}" class="hero__avatar-img" src="{{userInfo.avatarUrl}}" mode="aspectFill" />
+        <view wx:else class="hero__avatar-fallback">A</view>
+      </view>
+    </view>
+  </view>
+
+  <t-card title="本月支出统计" extra="{{month}}">
+    <stat-grid items="{{summaryCards}}" />
+  </t-card>
+
+  <view class="spacer"></view>
+
+  <t-card title="AI 输入框" extra="自然语言记账">
+    <view class="ai-box">
+      <textarea
+        class="ai-box__input"
+        placeholder="例如：今天和同事在公司附近吃饭 68 元，地铁 4 元"
+        value="{{aiPrompt}}"
+        bindinput="handlePromptInput"
+        maxlength="300"
+      ></textarea>
+      <view class="ai-box__actions">
+        <t-button bindtap="handleAiAnalyze">AI 分析</t-button>
+        <t-button theme="ghost" bindtap="handleGoReport">查看月报</t-button>
+      </view>
+    </view>
+  </t-card>
+
+  <view class="spacer"></view>
+
+  <t-section title="快速入口" extra="TabBar">
+    <view class="action-grid">
+      <quick-action action="add" label="快速记账" hint="新增账单" tone="cyan" bindtap="handleQuickAction" />
+      <quick-action action="upload" label="上传截图" hint="OCR 预留" tone="emerald" bindtap="handleQuickAction" />
+      <quick-action action="bills" label="查看账单" hint="列表过滤" tone="violet" bindtap="handleQuickAction" />
+      <quick-action action="report" label="AI 分析" hint="生成月报" tone="rose" bindtap="handleQuickAction" />
+    </view>
+  </t-section>
+
+  <view class="spacer"></view>
+
+  <t-card title="今日消费卡片" extra="{{today}}">
+    <view wx:if="{{todayBills.length}}">
+      <bill-item wx:for="{{todayBills}}" wx:key="_id" bill="{{item}}" />
+    </view>
+    <t-empty wx:else title="今天还没有消费" description="记录第一笔账单后会显示在这里。" />
+  </t-card>
+
+  <view class="spacer"></view>
+
+  <t-card title="AI 消费分析卡片" extra="JSON 输出">
+    <view wx:if="{{aiReport}}" class="report-json">
+      <view class="report-json__row">结论：{{aiReport.summaryText}}</view>
+      <view class="report-json__row">建议：{{aiReport.adviceText}}</view>
+      <view class="report-json__row">标签：{{aiReport.tagsText}}</view>
+    </view>
+    <t-empty wx:else title="等待 AI 分析" description="输入一句话，生成结构化月度分析。" />
+  </t-card>
+
+  <view class="spacer"></view>
+
+  <t-card title="截图识别" extra="OCR + AI">
+    <view class="ocr">
+      <view class="ocr__sources">
+        <view
+          wx:for="{{ocrSources}}"
+          wx:key="value"
+          class="ocr__source {{ocrSource === item.value ? 'is-active' : ''}}"
+          data-value="{{item.value}}"
+          bindtap="handleSelectOcrSource"
+        >
+          {{item.label}}
+        </view>
+      </view>
+
+      <view class="ocr__actions">
+        <t-button block loading="{{ocrLoading}}" bindtap="handleUploadScreenshot">上传并识别</t-button>
+      </view>
+
+      <view wx:if="{{ocrResult}}" class="ocr-result">
+        <view class="ocr-result__head">
+          <view class="ocr-result__title">{{ocrResult.sourceLabel}}</view>
+          <view class="ocr-result__tag">{{ocrResult.cacheHit ? '缓存命中' : '已识别'}}</view>
+        </view>
+        <view class="ocr-result__line">文本：{{ocrResult.rawText}}</view>
+        <view class="ocr-result__line">解析：{{ocrResult.parsedBill.category}} · {{ocrResult.parsedBill.merchant}} · ¥{{ocrResult.parsedBill.amount}}</view>
+        <view class="ocr-result__line">日期：{{ocrResult.parsedBill.date}} · 类型：{{ocrResult.parsedBill.type}}</view>
+      </view>
+
+      <t-empty wx:elif="{{ocrError}}" title="识别失败" description="{{ocrError}}" />
+    </view>
+  </t-card>
+</view>
