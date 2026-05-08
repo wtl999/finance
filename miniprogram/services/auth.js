@@ -6,16 +6,7 @@ const isLoggedIn = () => Boolean(storage.get(STORAGE_KEYS.LOGIN_FLAG, false));
 
 const getCachedUser = () => storage.get(STORAGE_KEYS.USER_PROFILE, null);
 
-const login = async (profile = {}, phoneCode = '') => {
-  const result = await requestApi({
-    path: '/api/functions/login',
-    data: {
-      action: 'login',
-      data: profile,
-      phoneCode,
-    },
-  });
-
+const persistAuthResult = (result) => {
   if (result && result.success) {
     storage.set(STORAGE_KEYS.LOGIN_FLAG, true);
     storage.set(STORAGE_KEYS.USER_PROFILE, result.data.user);
@@ -23,7 +14,21 @@ const login = async (profile = {}, phoneCode = '') => {
       storage.set(STORAGE_KEYS.AUTH_TOKEN, result.data.token);
     }
   }
+};
 
+const login = async (payload = {}) => {
+  const result = await requestApi({
+    path: '/api/functions/login',
+    data: {
+      action: 'login',
+      mode: payload.mode || 'wechat',
+      wxLoginCode: payload.wxLoginCode || '',
+      phoneCode: payload.phoneCode || '',
+      data: payload.profile || {},
+    },
+  });
+
+  persistAuthResult(result);
   return result;
 };
 

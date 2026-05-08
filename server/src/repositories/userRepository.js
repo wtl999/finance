@@ -1,23 +1,20 @@
 // User repository: all session and profile persistence lives here.
 const { db } = require('../db');
-const { buildId, buildUserView, nowIso, normalizePhoneNumber } = require('../lib');
+const { buildId, buildUserView, nowIso, normalizePassword, normalizePhoneNumber } = require('../lib');
 const { DEFAULT_BILL_CATEGORIES, normalizeBillCategories } = require('../../miniprogram/utils/category');
 
-const getUserRow = (row = null) => (row || null);
+const PERMANENT_EXPIRES_AT = '9999-12-31T23:59:59.999Z';
 
 const getUserById = (id) => db.prepare('SELECT * FROM users WHERE id = ?').get(id) || null;
-
 const getUserByOpenId = (openid) => db.prepare('SELECT * FROM users WHERE openid = ?').get(openid) || null;
-
 const getUserByPhoneNumber = (phoneNumber) =>
-  db.prepare('SELECT * FROM users WHERE phoneNumber = ? LIMIT 1').get(normalizePhoneNumber(phoneNumber)) || null;
-
+  db.prepare('SELECT * FROM users WHERE phoneNumber = ? ORDER BY updatedAt DESC LIMIT 1').get(normalizePhoneNumber(phoneNumber)) || null;
 const getSessionByToken = (token) => db.prepare('SELECT * FROM sessions WHERE token = ?').get(token) || null;
 
 const createSession = (userId) => {
   const token = buildId('sess');
   const createdAt = nowIso();
-  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+  const expiresAt = PERMANENT_EXPIRES_AT;
 
   db.prepare('INSERT INTO sessions (token, userId, createdAt, expiresAt) VALUES (?, ?, ?, ?)').run(
     token,
@@ -33,14 +30,14 @@ const updateSessionUser = (token, userId) => {
   const session = getSessionByToken(token);
   if (!session) return null;
 
-  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+  const expiresAt = PERMANENT_EXPIRES_AT;
   db.prepare('UPDATE sessions SET userId = ?, expiresAt = ? WHERE token = ?').run(userId, expiresAt, token);
   return getSessionByToken(token);
 };
 
 const getUserByToken = (token) => {
   const session = getSessionByToken(token);
-  if (!session || new Date(session.expiresAt).getTime() <= Date.now()) return null;
+  if (!session) return null;
   return getUserById(session.userId);
 };
 
@@ -69,6 +66,7 @@ const saveUser = (user = {}) => {
     avatarUrl: user.avatarUrl || existing?.avatarUrl || '',
     phoneNumber: user.phoneNumber || existing?.phoneNumber || '',
     phoneCountryCode: user.phoneCountryCode || existing?.phoneCountryCode || '',
+    password: normalizePassword(user.password || existing?.password || ''),
     memberLevel: user.memberLevel || existing?.memberLevel || 'free',
     memberStatus: user.memberStatus || existing?.memberStatus || 'free',
     vipExpireTime: user.vipExpireTime || existing?.vipExpireTime || null,
@@ -95,6 +93,7 @@ const saveUser = (user = {}) => {
         avatarUrl = @avatarUrl,
         phoneNumber = @phoneNumber,
         phoneCountryCode = @phoneCountryCode,
+        password = @password,
         memberLevel = @memberLevel,
         memberStatus = @memberStatus,
         vipExpireTime = @vipExpireTime,
@@ -111,11 +110,11 @@ const saveUser = (user = {}) => {
     : db.prepare(`
       INSERT INTO users (
         id, openid, appid, unionid, nickname, avatarUrl, phoneNumber, phoneCountryCode,
-        memberLevel, memberStatus, vipExpireTime, aiQuotaLimit, aiQuotaRemaining, aiQuotaCycle,
+        password, memberLevel, memberStatus, vipExpireTime, aiQuotaLimit, aiQuotaRemaining, aiQuotaCycle,
         aiQuotaResetAt, aiUsedTotal, aiLastConsumeAt, billCategoriesJson, createdAt, updatedAt
       ) VALUES (
         @id, @openid, @appid, @unionid, @nickname, @avatarUrl, @phoneNumber, @phoneCountryCode,
-        @memberLevel, @memberStatus, @vipExpireTime, @aiQuotaLimit, @aiQuotaRemaining, @aiQuotaCycle,
+        @password, @memberLevel, @memberStatus, @vipExpireTime, @aiQuotaLimit, @aiQuotaRemaining, @aiQuotaCycle,
         @aiQuotaResetAt, @aiUsedTotal, @aiLastConsumeAt, @billCategoriesJson, @createdAt, @updatedAt
       )
     `);

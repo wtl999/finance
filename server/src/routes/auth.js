@@ -5,15 +5,26 @@ const { login, syncCurrentUser, updateProfile } = require('../services/authServi
 
 const router = express.Router();
 
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     const profile = req.body?.data || {};
     const phoneCode = String(req.body?.phoneCode || '').trim();
-    const result = login({
+    const mode = String(req.body?.mode || 'wechat').trim();
+    const wxLoginCode = String(req.body?.wxLoginCode || profile.wxLoginCode || '').trim();
+    const result = await login({
       currentUser: null,
       profile,
       phoneCode,
+      mode,
+      wxLoginCode,
     });
+
+    if (!result.user) {
+      return res.status(400).json({
+        success: false,
+        message: result.message || 'login failed',
+      });
+    }
 
     return res.json({
       success: true,
