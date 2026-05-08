@@ -10,6 +10,7 @@
       bind:categorychange="handleCategoryTap"
       bind:datechange="handleDateChange"
       bind:aiclassify="handleAiClassify"
+      bind:managecategories="handleManageCategories"
       bind:submit="handleSubmit"
     />
   </t-card>

@@ -2,7 +2,7 @@
   <t-card title="分类管理" extra="当前用户">
     <view class="intro">
       <view class="intro__title">分类只对当前账号有效</view>
-      <view class="intro__desc">支出和收入分类分别维护，保存后会同步到你的云端资料里。</view>
+      <view class="intro__desc">支出和收入分类分别维护，随时都能进来改，保存后会同步到你的云端资料里。</view>
     </view>
 
     <view class="type-tabs">

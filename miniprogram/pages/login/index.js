@@ -106,9 +106,9 @@ Page({
   async handleLogin() {
     if (this.data.loading) return;
 
-    if (!app.globalData.env) {
+    if (!app.globalData.apiBaseUrl) {
       wx.showToast({
-        title: '请先配置云开发环境ID',
+        title: '请先配置后端地址',
         icon: 'none',
       });
       return;
@@ -158,7 +158,7 @@ Page({
 
       if (errMsg.includes('timeout')) {
         wx.showToast({
-          title: '登录超时，请检查云函数',
+          title: '登录超时，请检查后端服务',
           icon: 'none',
         });
       } else {

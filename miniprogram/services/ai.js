@@ -1,10 +1,9 @@
-const { callFunction } = require('./cloud');
-const { CLOUD_FUNCTIONS } = require('../utils/config');
+const { requestApi } = require('./http');
 
 const classifyBillText = (data = {}) =>
-  callFunction(CLOUD_FUNCTIONS.AI_CLASSIFY, {
-    action: 'classify',
-    data,
+  requestApi({
+    path: '/api/functions/aiClassify',
+    data: { action: 'classify', data },
   });
 
 module.exports = {

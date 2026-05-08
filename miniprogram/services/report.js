@@ -1,10 +1,9 @@
-const { callFunction } = require('./cloud');
-const { CLOUD_FUNCTIONS } = require('../utils/config');
+const { requestApi } = require('./http');
 
 const generateMonthlyReport = (query = {}) =>
-  callFunction(CLOUD_FUNCTIONS.REPORT_SERVICE, {
-    action: 'generate',
-    data: query,
+  requestApi({
+    path: '/api/functions/reportService',
+    data: { action: 'generate', data: query },
   });
 
 module.exports = {

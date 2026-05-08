@@ -14,6 +14,10 @@
 
   <view class="bill-form__row">
     <view class="bill-form__label">分类</view>
+    <view class="bill-form__category-header">
+      <view class="bill-form__category-hint">可随时维护，保存后返回继续记账</view>
+      <view class="bill-form__category-link" bindtap="handleManageCategories">管理分类</view>
+    </view>
     <view class="bill-form__category-grid">
       <view
         wx:for="{{currentCategories}}"

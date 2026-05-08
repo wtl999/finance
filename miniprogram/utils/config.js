@@ -2,12 +2,15 @@ const APP_NAME = 'AI记账助手';
 
 module.exports = {
   APP_NAME,
-  CLOUD_ENV: 'cloud1-d3gk0y3id5101462f',
+  API_BASE_URL: 'http://127.0.0.1:3000',
   STORAGE_KEYS: {
     LOGIN_FLAG: 'finance.login.flag',
     USER_PROFILE: 'finance.user.profile',
+    AUTH_TOKEN: 'finance.auth.token',
+    API_BASE_URL: 'finance.api.baseUrl',
   },
   CLOUD_FUNCTIONS: {
+    // 兼容旧调用名，实际已经全部路由到 Node API。
     LOGIN: 'login',
     USER_SYNC: 'userSync',
     BILL_SERVICE: 'billService',

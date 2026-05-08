@@ -1,10 +1,9 @@
-const { callFunction } = require('./cloud');
-const { CLOUD_FUNCTIONS } = require('../utils/config');
+const { requestApi } = require('./http');
 
 const analyzeBills = (data = {}) =>
-  callFunction(CLOUD_FUNCTIONS.AI_ANALYZE, {
-    action: 'analyze',
-    data,
+  requestApi({
+    path: '/api/functions/aiAnalyze',
+    data: { action: 'analyze', data },
   });
 
 module.exports = {

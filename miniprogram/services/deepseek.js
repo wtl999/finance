@@ -1,10 +1,9 @@
-const { callFunction } = require('./cloud');
-const { CLOUD_FUNCTIONS } = require('../utils/config');
+const { requestApi } = require('./http');
 
 const parseBillText = (data = {}) =>
-  callFunction(CLOUD_FUNCTIONS.DEEPSEEK_BILL_PARSE, {
-    action: 'parse',
-    data,
+  requestApi({
+    path: '/api/functions/deepseekParse',
+    data: { action: 'parse', data },
   });
 
 module.exports = {

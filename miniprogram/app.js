@@ -1,38 +1,29 @@
-const { CLOUD_ENV, STORAGE_KEYS } = require('./utils/config');
-const { envList } = require('./envList');
+const { API_BASE_URL, STORAGE_KEYS } = require('./utils/config');
 const auth = require('./services/auth');
 const storage = require('./utils/storage');
 
-const resolveCloudEnv = () => {
-  if (CLOUD_ENV) return CLOUD_ENV;
-  const firstEnv = Array.isArray(envList) ? envList[0] : null;
-  return firstEnv?.envId || firstEnv?.env || '';
+const resolveApiBaseUrl = () => {
+  const fromStorage = String(storage.get(STORAGE_KEYS.API_BASE_URL, '') || '').trim();
+  return fromStorage || String(API_BASE_URL || '').trim();
 };
 
-const resolvedEnv = resolveCloudEnv();
+const resolvedApiBaseUrl = resolveApiBaseUrl();
 
 App({
   globalData: {
-    env: resolvedEnv,
+    env: '',
+    apiBaseUrl: resolvedApiBaseUrl,
     isLoggedIn: false,
     userInfo: null,
   },
 
   onLaunch() {
-    if (wx.cloud) {
-      const initOptions = resolvedEnv ? { env: resolvedEnv } : {};
-      wx.cloud.init({
-        ...initOptions,
-        traceUser: true,
-      });
-    }
-
-    if (!resolvedEnv) {
-      console.warn('[app] Cloud env is not configured. Set miniprogram/utils/config.js CLOUD_ENV or miniprogram/envList.js.');
+    if (!resolvedApiBaseUrl) {
+      console.warn('[app] Backend URL is not configured.');
     }
 
     this.syncLoginState();
-    if (this.globalData.isLoggedIn && resolvedEnv) {
+    if (this.globalData.isLoggedIn && resolvedApiBaseUrl) {
       auth.refreshUserState().catch(() => null);
     }
   },

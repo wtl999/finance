@@ -1,20 +1,15 @@
+const { requestApi, getBaseUrl } = require('./http');
+
 const callFunction = (name, data = {}) => {
-  if (!wx.cloud) {
-    return Promise.reject(new Error('wx.cloud is unavailable'));
+  const baseUrl = getBaseUrl();
+  if (baseUrl) {
+    return requestApi({
+      path: `/api/functions/${name}`,
+      data,
+    });
   }
 
-  return wx.cloud.callFunction({ name, data })
-    .then((response) => {
-      console.log('[cloud.callFunction] raw response', { name, response });
-      if (!response || typeof response.result === 'undefined') {
-        console.warn('[cloud.callFunction] empty result', { name, response });
-      }
-      return response.result || {};
-    })
-    .catch((error) => {
-      console.error('[cloud.callFunction] failed', { name, data, error });
-      throw error;
-    });
+  return Promise.reject(new Error('API base url is not configured'));
 };
 
 module.exports = {

@@ -1,7 +1,6 @@
-const { callFunction } = require('./cloud');
-const auth = require('./auth');
+const { requestApi } = require('./http');
 const storage = require('../utils/storage');
-const { STORAGE_KEYS, CLOUD_FUNCTIONS } = require('../utils/config');
+const { STORAGE_KEYS } = require('../utils/config');
 
 const syncCachedUser = (user) => {
   if (!user) return;
@@ -9,9 +8,9 @@ const syncCachedUser = (user) => {
 };
 
 const getBillCategories = async () =>
-  callFunction(CLOUD_FUNCTIONS.CATEGORY_SERVICE, {
-    action: 'get',
-    data: {},
+  requestApi({
+    path: '/api/functions/categoryService',
+    data: { action: 'get', data: {} },
   }).then((result) => {
     if (result?.success && result.data?.user) {
       syncCachedUser(result.data.user);
@@ -20,9 +19,9 @@ const getBillCategories = async () =>
   });
 
 const saveBillCategories = async (categories = {}) =>
-  callFunction(CLOUD_FUNCTIONS.CATEGORY_SERVICE, {
-    action: 'save',
-    data: { categories },
+  requestApi({
+    path: '/api/functions/categoryService',
+    data: { action: 'save', data: { categories } },
   }).then((result) => {
     if (result?.success && result.data?.user) {
       syncCachedUser(result.data.user);
@@ -31,9 +30,9 @@ const saveBillCategories = async (categories = {}) =>
   });
 
 const resetBillCategories = async () =>
-  callFunction(CLOUD_FUNCTIONS.CATEGORY_SERVICE, {
-    action: 'reset',
-    data: {},
+  requestApi({
+    path: '/api/functions/categoryService',
+    data: { action: 'reset', data: {} },
   }).then((result) => {
     if (result?.success && result.data?.user) {
       syncCachedUser(result.data.user);

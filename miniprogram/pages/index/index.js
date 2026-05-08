@@ -4,7 +4,7 @@ const billService = require('../../services/bill');
 const reportService = require('../../services/report');
 const ocrService = require('../../services/ocr');
 const { ROUTES, go } = require('../../utils/route');
-const { APP_NAME, OCR_SOURCES } = require('../../utils/config');
+const { APP_NAME } = require('../../utils/config');
 const { formatDate, formatMonth, formatMoney } = require('../../utils/format');
 const { getOcrSourceMeta } = require('../../utils/ocr');
 const { getBillCategories } = require('../../utils/category');
@@ -16,15 +16,12 @@ Page({
     month: formatMonth(new Date()),
     today: formatDate(new Date()),
     loading: false,
-    aiPrompt: '',
-    aiReport: null,
     summaryCards: [],
     todayBills: [],
     ocrLoading: false,
     ocrSource: 'wechat',
     ocrResult: null,
     ocrError: '',
-    ocrSources: OCR_SOURCES,
     categories: getBillCategories(auth.getCachedUser()),
   },
 
@@ -76,42 +73,6 @@ Page({
     }
   },
 
-  handlePromptInput(event) {
-    this.setData({
-      aiPrompt: event.detail.value,
-    });
-  },
-
-  async handleAiAnalyze() {
-    if (!this.data.aiPrompt.trim()) {
-      wx.showToast({
-        title: '请输入分析内容',
-        icon: 'none',
-      });
-      return;
-    }
-
-    this.setData({ loading: true });
-
-    try {
-      const result = await reportService.generateMonthlyReport({
-        month: this.data.month,
-        prompt: this.data.aiPrompt,
-      });
-
-      this.setData({
-        aiReport: result.data || null,
-      });
-    } catch (error) {
-      wx.showToast({
-        title: 'AI 分析失败',
-        icon: 'none',
-      });
-    } finally {
-      this.setData({ loading: false });
-    }
-  },
-
   handleQuickAction(event) {
     const { action } = event.detail || {};
 
@@ -124,18 +85,8 @@ Page({
     if (action === 'stats') go(ROUTES.stats, 'navigateTo');
   },
 
-  handleGoReport() {
-    go(ROUTES.report, 'navigateTo');
-  },
-
   handleOpenCategories() {
     go(ROUTES.categories, 'navigateTo');
-  },
-
-  handleSelectOcrSource(event) {
-    this.setData({
-      ocrSource: event.currentTarget.dataset.value,
-    });
   },
 
   async handleUploadScreenshot() {
@@ -185,9 +136,22 @@ Page({
       });
 
       wx.showToast({
-        title: '识别成功',
+        title: '识别并记账成功',
         icon: 'success',
       });
+
+      this.loadDashboard();
+      if (result.data?.bill) {
+        wx.showModal({
+          title: '已记账',
+          content: `${result.data.bill.type === 'income' ? '收入' : '支出'} ${result.data.bill.amount || 0} 元\n${result.data.bill.category || '其他'}\n${result.data.bill.date || ''}`,
+          showCancel: false,
+          confirmText: '查看账单',
+          success: () => {
+            go(ROUTES.bills, 'switchTab');
+          },
+        });
+      }
     } catch (error) {
       const message = error?.errMsg || error?.message || '上传失败';
       this.setData({

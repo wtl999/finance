@@ -88,6 +88,10 @@ Component({
       this.triggerEvent('aiclassify');
     },
 
+    handleManageCategories() {
+      this.triggerEvent('managecategories');
+    },
+
     handleSubmit() {
       this.triggerEvent('submit');
     },

@@ -34,26 +34,7 @@ Page({
       return;
     }
 
-    const user = auth.getCachedUser();
-    if (user?.billCategories) {
-      this.setData({
-        categories: getBillCategories(user),
-      });
-    } else {
-      const result = await categoryService.getBillCategories().catch(() => null);
-      if (result?.success && result.data?.user) {
-        this.setData({
-          categories: getBillCategories(result.data.user),
-        });
-        if (app.setLoginState) {
-          app.setLoginState(result.data.user);
-        }
-      }
-    }
-
-    this.setData({
-      form: makeEmptyForm(this.data.categories),
-    });
+    await this.refreshCategories();
   },
 
   handleInput(event) {
@@ -82,6 +63,10 @@ Page({
     this.setData({
       'form.category': event.detail.value,
     });
+  },
+
+  handleManageCategories() {
+    go(ROUTES.categories, 'navigateTo');
   },
 
   async handleAiClassify() {
@@ -167,6 +152,34 @@ Page({
       });
     } finally {
       this.setData({ loading: false });
+    }
+  },
+
+  async refreshCategories() {
+    if (!auth.isLoggedIn()) {
+      return;
+    }
+
+    const user = auth.getCachedUser();
+    if (user?.billCategories) {
+      const categories = getBillCategories(user);
+      this.setData({
+        categories,
+        form: makeEmptyForm(categories),
+      });
+      return;
+    }
+
+    const result = await categoryService.getBillCategories().catch(() => null);
+    if (result?.success && result.data?.user) {
+      const categories = getBillCategories(result.data.user);
+      this.setData({
+        categories,
+        form: makeEmptyForm(categories),
+      });
+      if (app.setLoginState) {
+        app.setLoginState(result.data.user);
+      }
     }
   },
 });

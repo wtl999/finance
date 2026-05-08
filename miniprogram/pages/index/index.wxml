@@ -33,31 +33,12 @@
 
   <view class="spacer"></view>
 
-  <t-card title="AI 输入框" extra="自然语言记账">
-    <view class="ai-box">
-      <textarea
-        class="ai-box__input"
-        placeholder="例如：今天和同事在公司附近吃饭 68 元，地铁 4 元"
-        value="{{aiPrompt}}"
-        bindinput="handlePromptInput"
-        maxlength="300"
-      ></textarea>
-      <view class="ai-box__actions">
-        <t-button bindtap="handleAiAnalyze">AI 分析</t-button>
-        <t-button theme="ghost" bindtap="handleGoReport">查看月报</t-button>
-        <t-button theme="ghost" bindtap="handleOpenCategories">管理分类</t-button>
-      </view>
-    </view>
-  </t-card>
-
-  <view class="spacer"></view>
-
   <t-section title="快捷入口" extra="TabBar">
     <view class="action-grid">
       <quick-action action="add" label="快速记账" hint="新增账单" tone="cyan" bindtap="handleQuickAction" />
       <quick-action action="upload" label="上传截图" hint="OCR 预留" tone="emerald" bindtap="handleQuickAction" />
       <quick-action action="bills" label="查看账单" hint="列表筛选" tone="violet" bindtap="handleQuickAction" />
-      <quick-action action="report" label="AI 分析" hint="生成月报" tone="rose" bindtap="handleQuickAction" />
+      <quick-action action="report" label="月报" hint="生成分析" tone="rose" bindtap="handleQuickAction" />
     </view>
   </t-section>
 

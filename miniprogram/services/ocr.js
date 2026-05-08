@@ -1,9 +1,7 @@
-const { callFunction } = require('./cloud');
+const { uploadApiFile } = require('./http');
 const billService = require('./bill');
-const { CLOUD_FUNCTIONS } = require('../utils/config');
 const {
   buildOcrCacheKey,
-  buildUploadCloudPath,
   normalizeSource,
 } = require('../utils/ocr');
 
@@ -16,28 +14,6 @@ const getFileInfo = (filePath) =>
       fail: reject,
     });
   });
-
-const uploadScreenshot = ({ filePath, source }) =>
-  wx.cloud.uploadFile({
-    cloudPath: buildUploadCloudPath({
-      source,
-      fileHash: '',
-      filePath,
-    }),
-    filePath,
-  });
-
-const recognizeScreenshot = async ({ fileID, fileHash, source, fileName = '' }) => {
-  return callFunction(CLOUD_FUNCTIONS.OCR, {
-    action: 'recognize',
-    data: {
-      fileID,
-      fileHash,
-      source: normalizeSource(source),
-      fileName,
-    },
-  });
-};
 
 const saveBillFromOcr = async (ocrResult) => {
   if (!ocrResult || !ocrResult.parsedBill) {
@@ -67,21 +43,19 @@ const uploadRecognizeAndSave = async ({ filePath, source = 'wechat' }) => {
   const normalizedSource = normalizeSource(source);
   const fileInfo = await getFileInfo(filePath);
   const fileHash = fileInfo.digest || fileInfo.md5 || '';
-  const uploadRes = await wx.cloud.uploadFile({
-    cloudPath: buildUploadCloudPath({
+  // OCR 请求统一走 Node API，避免前端再依赖云函数能力。
+  const uploadRes = await uploadApiFile({
+    path: '/api/ocr/recognize',
+    filePath,
+    name: 'file',
+    formData: {
       source: normalizedSource,
       fileHash,
-      filePath,
-    }),
-    filePath,
+      fileName: filePath.split(/[\\/]/).pop() || '',
+    },
   });
 
-  const ocrRes = await recognizeScreenshot({
-    fileID: uploadRes.fileID,
-    fileHash,
-    source: normalizedSource,
-    fileName: filePath.split(/[\\/]/).pop() || '',
-  });
+  const ocrRes = uploadRes;
 
   if (!ocrRes.success) {
     console.error('[OCR] recognize failed', {
@@ -108,7 +82,12 @@ const uploadRecognizeAndSave = async ({ filePath, source = 'wechat' }) => {
       success: false,
       message: billRes.message || 'save bill failed',
       data: {
-        upload: uploadRes,
+        upload: {
+          filePath,
+          fileHash,
+          source: normalizedSource,
+          fileName: filePath.split(/[\\/]/).pop() || '',
+        },
         ocr: ocrRes.data,
         bill: billRes.data || null,
         cacheKey: buildOcrCacheKey({
@@ -122,7 +101,12 @@ const uploadRecognizeAndSave = async ({ filePath, source = 'wechat' }) => {
   return {
     success: true,
     data: {
-      upload: uploadRes,
+      upload: {
+        filePath,
+        fileHash,
+        source: normalizedSource,
+        fileName: filePath.split(/[\\/]/).pop() || '',
+      },
       ocr: ocrRes.data,
       bill: billRes.data || null,
       cacheKey: buildOcrCacheKey({
@@ -135,8 +119,6 @@ const uploadRecognizeAndSave = async ({ filePath, source = 'wechat' }) => {
 
 module.exports = {
   getFileInfo,
-  uploadScreenshot,
-  recognizeScreenshot,
   saveBillFromOcr,
   uploadRecognizeAndSave,
 };
