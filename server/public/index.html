@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>AI记账登录</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="login-page">
+    <section class="shell">
+      <header class="brand">
+        <p class="brand__eyebrow">AI 记账助手</p>
+        <h1 class="brand__title">先登录，再自动记账</h1>
+        <p class="brand__desc">未登录时进入 H5 登录页。登录后会直接完成记账，并提供跳转小程序入口。</p>
+      </header>
+
+      <section class="profile-panel" id="loginPanel">
+        <div class="profile-panel__fields">
+          <label class="field">
+            <span class="field__label">账号</span>
+            <input id="phoneNumber" class="field__input" autocomplete="username" inputmode="numeric" placeholder="手机号或账号" />
+          </label>
+          <label class="field">
+            <span class="field__label">密码</span>
+            <input id="password" class="field__input" type="password" autocomplete="current-password" placeholder="请输入密码" />
+          </label>
+        </div>
+
+        <div class="profile-panel__actions">
+          <button id="loginButton" class="action-button" type="button">登录并记账</button>
+        </div>
+      </section>
+
+      <section class="profile-panel" id="statePanel" hidden>
+        <div class="state-card">
+          <div class="state-card__title">记账结果</div>
+          <div class="state-card__meta" id="billMeta">等待登录后自动记账</div>
+        </div>
+        <div class="state-card state-card--soft">
+          <div class="state-card__title">跳转小程序</div>
+          <div class="state-card__meta">记账完成后可直接进入小程序查看明细。</div>
+          <a id="miniProgramLink" class="action-link" href="#" target="_self" rel="noreferrer">打开小程序</a>
+        </div>
+      </section>
+
+      <section class="profile-panel" id="errorPanel" hidden>
+        <div class="hint-list">
+          <div class="hint-item" id="messageText">-</div>
+        </div>
+      </section>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
