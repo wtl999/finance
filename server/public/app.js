@@ -1,20 +1,14 @@
-const API_BASE = '';
+const MINI_APP_ID = 'wx4d7ca2f1e2eafe6b';
+const MINI_PATH = 'miniprogram/pages/index/index';
+
 const $ = (id) => document.getElementById(id);
 
 const state = {
-  loggedIn: false,
   token: localStorage.getItem('finance_token') || '',
   query: {},
-  submitting: false,
-};
-
-const formatDate = (value) => {
-  const date = value ? new Date(value) : new Date();
-  if (Number.isNaN(date.getTime())) return '';
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  loggedIn: false,
+  working: false,
+  billResult: null,
 };
 
 const parseQuery = () => {
@@ -26,8 +20,16 @@ const parseQuery = () => {
   };
 };
 
+const today = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const request = async (path, body, token = state.token) => {
-  const response = await fetch(`${API_BASE}${path}`, {
+  const response = await fetch(path, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
@@ -35,6 +37,7 @@ const request = async (path, body, token = state.token) => {
     },
     body: JSON.stringify(body),
   });
+
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     throw new Error(data.message || `Request failed: ${response.status}`);
@@ -42,20 +45,31 @@ const request = async (path, body, token = state.token) => {
   return data;
 };
 
-const setResult = (payload) => {
-  $('resultCard').hidden = false;
-  $('resultText').textContent = typeof payload === 'string' ? payload : JSON.stringify(payload, null, 2);
+const setMessage = (message) => {
+  $('messageText').textContent = message;
+  $('errorPanel').hidden = false;
 };
 
-const syncView = () => {
-  const { type, amount, remark } = state.query;
-  $('billTypeText').textContent = type === 'income' ? '收入' : '支出';
-  $('billAmountText').textContent = amount ? Number(amount).toFixed(2) : '-';
-  $('billRemarkText').textContent = remark || '-';
-  $('billDateText').textContent = formatDate(new Date());
-  $('loginState').textContent = state.loggedIn ? '已登录' : '未登录';
-  $('loginCard').hidden = state.loggedIn;
-  $('actionCard').hidden = !state.loggedIn;
+const syncMiniProgramLink = () => {
+  const link = $('miniProgramLink');
+  const query = new URLSearchParams({
+    type: state.query.type || 'expense',
+    amount: state.query.amount || '',
+    remark: state.query.remark || '',
+    date: today(),
+  }).toString();
+  link.href = `weixin://dl/business/?appid=${MINI_APP_ID}&path=${encodeURIComponent(`${MINI_PATH}?${query}`)}`;
+};
+
+const renderBillState = (result) => {
+  $('billMeta').textContent = [
+    `类型：${state.query.type === 'income' ? '收入' : '支出'}`,
+    `金额：${state.query.amount || '-'}`,
+    `备注：${state.query.remark || '-'}`,
+    `日期：${today()}`,
+    result ? `状态：${result.success ? '记账成功' : '记账失败'}` : '状态：待处理',
+  ].join(' / ');
+  $('statePanel').hidden = false;
 };
 
 const loadSession = async () => {
@@ -73,14 +87,18 @@ const loadSession = async () => {
   return false;
 };
 
-const login = async (phoneNumber, password) => {
+const login = async () => {
+  const phoneNumber = $('phoneNumber').value.trim();
+  const password = $('password').value;
+  if (!phoneNumber || !password) {
+    throw new Error('请输入账号和密码');
+  }
+
   const result = await request('/api/functions/login', {
     mode: 'password',
     phoneNumber,
     password,
-    data: {
-      nickname: phoneNumber,
-    },
+    data: { nickname: phoneNumber },
   }, '');
 
   if (!result || !result.success) {
@@ -89,90 +107,76 @@ const login = async (phoneNumber, password) => {
 
   state.token = result.data.token || '';
   state.loggedIn = true;
-  if (state.token) {
-    localStorage.setItem('finance_token', state.token);
-  }
+  localStorage.setItem('finance_token', state.token);
   return result;
 };
 
 const createBill = async () => {
-  if (state.submitting) return;
-  state.submitting = true;
-  $('submitButton').disabled = true;
-  try {
-    const payload = {
-      action: 'create',
-      data: {
-        type: state.query.type === 'income' ? 'income' : 'expense',
-        amount: Number(state.query.amount || 0),
-        category: state.query.type === 'income' ? '收入' : '其他',
-        merchant: '',
-        remark: state.query.remark || '',
-        date: formatDate(new Date()),
-        source: 'h5',
-      },
-    };
-    const result = await request('/api/functions/billService', payload);
-    if (!result || !result.success) {
-      throw new Error(result?.message || '记账失败');
-    }
-    setResult({
-      success: true,
-      message: '记账成功',
-      bill: result.data,
-    });
-  } finally {
-    state.submitting = false;
-    $('submitButton').disabled = false;
+  const payload = {
+    action: 'create',
+    data: {
+      type: state.query.type === 'income' ? 'income' : 'expense',
+      amount: Number(state.query.amount || 0),
+      category: state.query.type === 'income' ? '收入' : '其他',
+      merchant: '',
+      remark: state.query.remark || '',
+      date: today(),
+      source: 'h5',
+    },
+  };
+
+  const result = await request('/api/functions/billService', payload);
+  if (!result || !result.success) {
+    throw new Error(result?.message || '记账失败');
   }
+
+  state.billResult = result.data;
+  renderBillState({ success: true });
+  setMessage('记账完成');
+  return result;
 };
 
-const init = async () => {
-  state.query = parseQuery();
-  syncView();
+const showLoggedInView = () => {
+  $('loginPanel').hidden = true;
+  $('statePanel').hidden = false;
+  syncMiniProgramLink();
+};
 
-  $('loginForm').addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const phoneNumber = $('phoneNumber').value.trim();
-    const password = $('password').value;
-    if (!phoneNumber || !password) {
-      setResult('请输入账号和密码');
-      return;
-    }
+const run = async () => {
+  state.query = parseQuery();
+  syncMiniProgramLink();
+
+  $('loginButton').addEventListener('click', async () => {
+    if (state.working) return;
+    state.working = true;
+    $('loginButton').disabled = true;
     try {
-      $('loginButton').disabled = true;
-      const result = await login(phoneNumber, password);
-      setResult({ success: true, message: '登录成功' });
-      syncView();
-      if (result?.success) {
-        await createBill();
-      }
+      await login();
+      showLoggedInView();
+      await createBill();
     } catch (error) {
-      setResult(error.message || '登录失败');
+      setMessage(error.message || '登录失败');
     } finally {
+      state.working = false;
       $('loginButton').disabled = false;
     }
   });
 
-  $('submitButton').addEventListener('click', async () => {
-    try {
-      await createBill();
-    } catch (error) {
-      setResult(error.message || '记账失败');
-    }
-  });
-
   const loggedIn = await loadSession();
-  syncView();
   if (loggedIn) {
+    showLoggedInView();
     try {
       await createBill();
     } catch (error) {
-      setResult(error.message || '自动记账失败');
+      renderBillState({ success: false });
+      setMessage(error.message || '自动记账失败');
     }
   } else {
-    setResult('请先使用账号密码登录后继续记账');
+    $('loginPanel').hidden = false;
+    $('statePanel').hidden = true;
   }
+
+  syncMiniProgramLink();
 };
 
-init();
+run();

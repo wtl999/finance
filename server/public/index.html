@@ -3,55 +3,51 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>快速记账</title>
+  <title>AI记账登录</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <main class="page">
+  <main class="login-page">
     <section class="shell">
-      <header class="hero">
-        <div>
-          <p class="eyebrow">H5 快速记账</p>
-          <h1>从链接参数直接落账</h1>
-          <p class="sub">支持未登录先登录，已登录直接记账，时间默认今天。</p>
-        </div>
-        <div class="badge" id="loginState">未登录</div>
+      <header class="brand">
+        <p class="brand__eyebrow">AI 记账助手</p>
+        <h1 class="brand__title">先登录，再自动记账</h1>
+        <p class="brand__desc">未登录时进入 H5 登录页。登录后会直接完成记账，并提供跳转小程序入口。</p>
       </header>
 
-      <section class="card">
-        <h2>账单信息</h2>
-        <div class="kv">
-          <div><span>类型</span><strong id="billTypeText">-</strong></div>
-          <div><span>金额</span><strong id="billAmountText">-</strong></div>
-          <div><span>备注</span><strong id="billRemarkText">-</strong></div>
-          <div><span>日期</span><strong id="billDateText">-</strong></div>
+      <section class="profile-panel" id="loginPanel">
+        <div class="profile-panel__fields">
+          <label class="field">
+            <span class="field__label">账号</span>
+            <input id="phoneNumber" class="field__input" autocomplete="username" inputmode="numeric" placeholder="手机号或账号" />
+          </label>
+          <label class="field">
+            <span class="field__label">密码</span>
+            <input id="password" class="field__input" type="password" autocomplete="current-password" placeholder="请输入密码" />
+          </label>
+        </div>
+
+        <div class="profile-panel__actions">
+          <button id="loginButton" class="action-button" type="button">登录并记账</button>
         </div>
       </section>
 
-      <section class="card" id="loginCard">
-        <h2>账号密码登录</h2>
-        <form id="loginForm" class="form">
-          <label>
-            <span>账号</span>
-            <input id="phoneNumber" autocomplete="username" inputmode="numeric" placeholder="手机号或账号" />
-          </label>
-          <label>
-            <span>密码</span>
-            <input id="password" type="password" autocomplete="current-password" placeholder="请输入密码" />
-          </label>
-          <button type="submit" id="loginButton">登录并继续</button>
-        </form>
+      <section class="profile-panel" id="statePanel" hidden>
+        <div class="state-card">
+          <div class="state-card__title">记账结果</div>
+          <div class="state-card__meta" id="billMeta">等待登录后自动记账</div>
+        </div>
+        <div class="state-card state-card--soft">
+          <div class="state-card__title">跳转小程序</div>
+          <div class="state-card__meta">记账完成后可直接进入小程序查看明细。</div>
+          <a id="miniProgramLink" class="action-link" href="#" target="_self" rel="noreferrer">打开小程序</a>
+        </div>
       </section>
 
-      <section class="card" id="actionCard" hidden>
-        <h2>执行记账</h2>
-        <p class="hint">登录后将直接调用后端记账接口。</p>
-        <button id="submitButton" type="button">立即记账</button>
-      </section>
-
-      <section class="card result" id="resultCard" hidden>
-        <h2>结果</h2>
-        <pre id="resultText"></pre>
+      <section class="profile-panel" id="errorPanel" hidden>
+        <div class="hint-list">
+          <div class="hint-item" id="messageText">-</div>
+        </div>
       </section>
     </section>
   </main>
