@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>快速记账</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="page">
+    <section class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">H5 快速记账</p>
+          <h1>从链接参数直接落账</h1>
+          <p class="sub">支持未登录先登录，已登录直接记账，时间默认今天。</p>
+        </div>
+        <div class="badge" id="loginState">未登录</div>
+      </header>
+
+      <section class="card">
+        <h2>账单信息</h2>
+        <div class="kv">
+          <div><span>类型</span><strong id="billTypeText">-</strong></div>
+          <div><span>金额</span><strong id="billAmountText">-</strong></div>
+          <div><span>备注</span><strong id="billRemarkText">-</strong></div>
+          <div><span>日期</span><strong id="billDateText">-</strong></div>
+        </div>
+      </section>
+
+      <section class="card" id="loginCard">
+        <h2>账号密码登录</h2>
+        <form id="loginForm" class="form">
+          <label>
+            <span>账号</span>
+            <input id="phoneNumber" autocomplete="username" inputmode="numeric" placeholder="手机号或账号" />
+          </label>
+          <label>
+            <span>密码</span>
+            <input id="password" type="password" autocomplete="current-password" placeholder="请输入密码" />
+          </label>
+          <button type="submit" id="loginButton">登录并继续</button>
+        </form>
+      </section>
+
+      <section class="card" id="actionCard" hidden>
+        <h2>执行记账</h2>
+        <p class="hint">登录后将直接调用后端记账接口。</p>
+        <button id="submitButton" type="button">立即记账</button>
+      </section>
+
+      <section class="card result" id="resultCard" hidden>
+        <h2>结果</h2>
+        <pre id="resultText"></pre>
+      </section>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
